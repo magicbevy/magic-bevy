@@ -20,7 +20,10 @@ struct Cli {
 enum Commands {
     /// Initialize a new package
     Init {
-        /// Package identifier in vendor/name format (e.g. my_studio/physics_tool)
+        /// Category name (e.g. editor, runtime, games)
+        #[arg(long, default_value = "editor")]
+        category: String,
+        /// Package identifier in vendor/name format (e.g. magicbevy/lighting_tools)
         package: String,
         /// Include editor target
         #[arg(long)]
@@ -28,6 +31,16 @@ enum Commands {
         /// Include runtime target
         #[arg(long)]
         runtime: bool,
+    },
+    /// Install a package from a GitHub repository (e.g. magicbevy/lighting_tools#v0.1.0)
+    InstallRepo {
+        /// Repository reference in vendor/name#version format
+        repo: String,
+    },
+    /// Install a package from a local zip file
+    InstallZip {
+        /// Path to the local zip file
+        file: PathBuf,
     },
     /// Remove an existing package
     Remove {
@@ -56,6 +69,7 @@ fn main() {
 
     match cli.command {
         Commands::Init {
+            category,
             package,
             editor,
             runtime,
@@ -80,12 +94,13 @@ fn main() {
                 targets.push(PackageTarget::Runtime);
             }
 
-            match manager.init_package(vendor, name, targets) {
+            match manager.init_package(&category, vendor, name, targets) {
                 Ok((manifest, report)) => {
                     mgsuccess!(
                         TAG,
-                        "Created package {} at {}",
+                        "Created package {} in category '{}' at {}",
                         manifest.id(),
+                        manifest.category,
                         manifest.root.display()
                     );
                     mgprint!(
@@ -99,6 +114,97 @@ fn main() {
                 }
                 Err(err) => {
                     mgerror!(TAG, "Failed to initialize package: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::InstallRepo { repo } => {
+            let parts: Vec<&str> = repo.split('#').collect();
+            if parts.is_empty() || parts[0].is_empty() {
+                mgerror!(TAG, "Invalid repository format. Expected 'vendor/name#version' (e.g. 'magicbevy/lighting_tools#v0.1.0')");
+                std::process::exit(1);
+            }
+            let package_part = parts[0];
+            let version = if parts.len() > 1 && !parts[1].is_empty() {
+                parts[1]
+            } else {
+                "v0.1.0"
+            };
+
+            let (vendor, name) = match parse_vendor_and_name(package_part) {
+                Ok(res) => res,
+                Err(err) => {
+                    mgerror!(TAG, "{}", err);
+                    std::process::exit(1);
+                }
+            };
+
+            match manager.install_repo(vendor, name, version) {
+                Ok(manifest) => {
+                    match manager.sync() {
+                        Ok(report) => {
+                            mgsuccess!(
+                                TAG,
+                                "Successfully installed package {} version {}.",
+                                manifest.id(),
+                                manifest.version
+                            );
+                            mgprint!(
+                                TAG,
+                                "Synchronized workspace (Enabled: {}, Editor: {}, Runtime: {}, updated {} manifest & code files).",
+                                report.enabled,
+                                report.editor_packages,
+                                report.runtime_packages,
+                                report.updated_manifests + report.updated_code_files
+                            );
+                        }
+                        Err(err) => {
+                            mgerror!(TAG, "Package installed, but workspace sync failed: {}", err);
+                            std::process::exit(1);
+                        }
+                    }
+                }
+                Err(err) => {
+                    mgerror!(TAG, "Failed to install package: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+
+        Commands::InstallZip { file } => {
+            if !file.is_file() {
+                mgerror!(TAG, "Zip file not found at {}", file.display());
+                std::process::exit(1);
+            }
+
+            match manager.install_from_zip(&file) {
+                Ok(manifest) => {
+                    match manager.sync() {
+                        Ok(report) => {
+                            mgsuccess!(
+                                TAG,
+                                "Successfully installed package {} version {} from zip archive.",
+                                manifest.id(),
+                                manifest.version
+                            );
+                            mgprint!(
+                                TAG,
+                                "Synchronized workspace (Enabled: {}, Editor: {}, Runtime: {}, updated {} manifest & code files).",
+                                report.enabled,
+                                report.editor_packages,
+                                report.runtime_packages,
+                                report.updated_manifests + report.updated_code_files
+                            );
+                        }
+                        Err(err) => {
+                            mgerror!(TAG, "Package installed, but workspace sync failed: {}", err);
+                            std::process::exit(1);
+                        }
+                    }
+                }
+                Err(err) => {
+                    mgerror!(TAG, "Failed to install package from zip: {}", err);
                     std::process::exit(1);
                 }
             }
@@ -206,18 +312,20 @@ fn parse_vendor_and_name(input: &str) -> Result<(&str, &str), String> {
         Ok((parts[0], parts[1]))
     } else {
         Err(format!(
-            "Invalid package format '{input}'. Expected 'vendor/name' (e.g. 'my_studio/physics_tool')"
+            "Invalid package format '{input}'. Expected 'vendor/name' (e.g. 'magicbevy/lighting_tools')"
         ))
     }
 }
 
 fn print_packages_table(packages: &[PackageManifest]) {
+    let mut cat_w = 8;
     let mut id_w = 12;
     let mut ver_w = 7;
     let mut stat_w = 8;
     let mut targ_w = 10;
 
     for p in packages {
+        cat_w = cat_w.max(p.category.len());
         id_w = id_w.max(p.id().len());
         ver_w = ver_w.max(p.version.len());
         let status_str = if p.enabled { "Enabled" } else { "Disabled" };
@@ -235,38 +343,44 @@ fn print_packages_table(packages: &[PackageManifest]) {
         targ_w = targ_w.max(targets_str.len());
     }
 
+    cat_w += 2;
     id_w += 2;
     ver_w += 2;
     stat_w += 2;
     targ_w += 2;
 
     let top = format!(
-        "┌{}┬{}┬{}┬{}┐",
+        "┌{}┬{}┬{}┬{}┬{}┐",
+        "─".repeat(cat_w),
         "─".repeat(id_w),
         "─".repeat(ver_w),
         "─".repeat(stat_w),
         "─".repeat(targ_w)
     );
     let header = format!(
-        "│ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+        "│ {:<cat_len$} │ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+        "Category",
         "Package ID",
         "Version",
         "Status",
         "Targets",
+        cat_len = cat_w - 2,
         id_len = id_w - 2,
         ver_len = ver_w - 2,
         stat_len = stat_w - 2,
         targ_len = targ_w - 2
     );
     let sep = format!(
-        "├{}┼{}┼{}┼{}┤",
+        "├{}┼{}┼{}┼{}┼{}┤",
+        "─".repeat(cat_w),
         "─".repeat(id_w),
         "─".repeat(ver_w),
         "─".repeat(stat_w),
         "─".repeat(targ_w)
     );
     let bot = format!(
-        "└{}┴{}┴{}┴{}┘",
+        "└{}┴{}┴{}┴{}┴{}┘",
+        "─".repeat(cat_w),
         "─".repeat(id_w),
         "─".repeat(ver_w),
         "─".repeat(stat_w),
@@ -289,11 +403,13 @@ fn print_packages_table(packages: &[PackageManifest]) {
             .join(", ");
 
         println!(
-            "    │ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+            "    │ {:<cat_len$} │ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+            p.category,
             p.id(),
             p.version,
             status_str,
             targets_str,
+            cat_len = cat_w - 2,
             id_len = id_w - 2,
             ver_len = ver_w - 2,
             stat_len = stat_w - 2,

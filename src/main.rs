@@ -75,10 +75,9 @@ impl MagicBevyApp {
         if Path::new(lib_path).exists() {
             unsafe {
                 if let Ok(lib) = libloading::Library::new(lib_path) {
-                    // تعریف امضای تابع ریجستر
+
                     type RegisterFn = unsafe extern "Rust" fn(&mut EditorRegistry);
 
-                    // استخراج تابع از لایبرری و اجرای آن
                     if let Ok(register_all_packages) = lib.get::<RegisterFn>(b"register_all_packages\0") {
                         let mut editor_registry = EditorRegistry {
                             menu: &mut self.menu_registry,
