@@ -32,15 +32,10 @@ enum Commands {
         #[arg(long)]
         runtime: bool,
     },
-    /// Install a package from a GitHub repository (e.g. magicbevy/lighting_tools#v0.1.0)
-    InstallRepo {
-        /// Repository reference in vendor/name#version format
-        repo: String,
-    },
-    /// Install a package from a local zip file
-    InstallZip {
-        /// Path to the local zip file
-        file: PathBuf,
+    /// Install a package from a repository reference (vendor/name#version) or a local zip file
+    Install {
+        /// Repository reference (e.g. magicbevy/lighting_tools#v0.1.0) or path to a local zip file
+        source: String,
     },
     /// Remove an existing package
     Remove {
@@ -119,93 +114,52 @@ fn main() {
             }
         }
 
-        Commands::InstallRepo { repo } => {
-            let parts: Vec<&str> = repo.split('#').collect();
-            if parts.is_empty() || parts[0].is_empty() {
-                mgerror!(TAG, "Invalid repository format. Expected 'vendor/name#version' (e.g. 'magicbevy/lighting_tools#v0.1.0')");
-                std::process::exit(1);
-            }
-            let package_part = parts[0];
-            let version = if parts.len() > 1 && !parts[1].is_empty() {
-                parts[1]
+        Commands::Install { source } => {
+            let file_path = PathBuf::from(&source);
+
+            if file_path.is_file() {
+                match manager.install_from_zip(&file_path) {
+                    Ok(manifest) => {
+                        handle_successful_install(&manager, manifest, "zip archive");
+                    }
+                    Err(err) => {
+                        mgerror!(TAG, "Failed to install package from zip: {}", err);
+                        std::process::exit(1);
+                    }
+                }
             } else {
-                "v0.1.0"
-            };
 
-            let (vendor, name) = match parse_vendor_and_name(package_part) {
-                Ok(res) => res,
-                Err(err) => {
-                    mgerror!(TAG, "{}", err);
+                let parts: Vec<&str> = source.split('#').collect();
+                if parts.is_empty() || parts[0].is_empty() {
+                    mgerror!(
+                        TAG,
+                        "Invalid install source. Expected 'vendor/name#version' or a valid local zip file path."
+                    );
                     std::process::exit(1);
                 }
-            };
+                let package_part = parts[0];
+                let version = if parts.len() > 1 && !parts[1].is_empty() {
+                    parts[1]
+                } else {
+                    "v0.1.0"
+                };
 
-            match manager.install_repo(vendor, name, version) {
-                Ok(manifest) => {
-                    match manager.sync() {
-                        Ok(report) => {
-                            mgsuccess!(
-                                TAG,
-                                "Successfully installed package {} version {}.",
-                                manifest.id(),
-                                manifest.version
-                            );
-                            mgprint!(
-                                TAG,
-                                "Synchronized workspace (Enabled: {}, Editor: {}, Runtime: {}, updated {} manifest & code files).",
-                                report.enabled,
-                                report.editor_packages,
-                                report.runtime_packages,
-                                report.updated_manifests + report.updated_code_files
-                            );
-                        }
-                        Err(err) => {
-                            mgerror!(TAG, "Package installed, but workspace sync failed: {}", err);
-                            std::process::exit(1);
-                        }
+                let (vendor, name) = match parse_vendor_and_name(package_part) {
+                    Ok(res) => res,
+                    Err(err) => {
+                        mgerror!(TAG, "{}", err);
+                        std::process::exit(1);
                     }
-                }
-                Err(err) => {
-                    mgerror!(TAG, "Failed to install package: {}", err);
-                    std::process::exit(1);
-                }
-            }
-        }
+                };
 
-        Commands::InstallZip { file } => {
-            if !file.is_file() {
-                mgerror!(TAG, "Zip file not found at {}", file.display());
-                std::process::exit(1);
-            }
-
-            match manager.install_from_zip(&file) {
-                Ok(manifest) => {
-                    match manager.sync() {
-                        Ok(report) => {
-                            mgsuccess!(
-                                TAG,
-                                "Successfully installed package {} version {} from zip archive.",
-                                manifest.id(),
-                                manifest.version
-                            );
-                            mgprint!(
-                                TAG,
-                                "Synchronized workspace (Enabled: {}, Editor: {}, Runtime: {}, updated {} manifest & code files).",
-                                report.enabled,
-                                report.editor_packages,
-                                report.runtime_packages,
-                                report.updated_manifests + report.updated_code_files
-                            );
-                        }
-                        Err(err) => {
-                            mgerror!(TAG, "Package installed, but workspace sync failed: {}", err);
-                            std::process::exit(1);
-                        }
+                match manager.install_repo(vendor, name, version) {
+                    Ok(manifest) => {
+                        handle_successful_install(&manager, manifest, "repository");
                     }
-                }
-                Err(err) => {
-                    mgerror!(TAG, "Failed to install package from zip: {}", err);
-                    std::process::exit(1);
+                    Err(err) => {
+                        mgerror!(TAG, "Failed to install package: {}", err);
+                        std::process::exit(1);
+                    }
                 }
             }
         }
@@ -276,6 +230,32 @@ fn main() {
                 std::process::exit(1);
             }
         },
+    }
+}
+
+fn handle_successful_install(manager: &PackageManager, manifest: PackageManifest, source_type: &str) {
+    match manager.sync() {
+        Ok(report) => {
+            mgsuccess!(
+                TAG,
+                "Successfully installed package {} version {} from {}.",
+                manifest.id(),
+                manifest.version,
+                source_type
+            );
+            mgprint!(
+                TAG,
+                "Synchronized workspace (Enabled: {}, Editor: {}, Runtime: {}, updated {} manifest & code files).",
+                report.enabled,
+                report.editor_packages,
+                report.runtime_packages,
+                report.updated_manifests + report.updated_code_files
+            );
+        }
+        Err(err) => {
+            mgerror!(TAG, "Package installed, but workspace sync failed: {}", err);
+            std::process::exit(1);
+        }
     }
 }
 
