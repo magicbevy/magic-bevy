@@ -443,3 +443,258 @@ pub fn get_workspace_engine_version(workspace_root: &Path) -> Option<String> {
         .and_then(|v| v.as_str())
         .map(String::from)
 }
+
+pub struct OutdatedInfo {
+    pub id: String,
+    pub current_version: String,
+    pub latest_version: String,
+}
+
+pub fn print_packages_table(packages: &[crate::manifest::PackageManifest]) {
+    let mut cat_w = 8;
+    let mut id_w = 12;
+    let mut ver_w = 7;
+    let mut stat_w = 8;
+    let mut targ_w = 10;
+
+    for p in packages {
+        cat_w = cat_w.max(p.category.len());
+        id_w = id_w.max(p.id().len());
+        ver_w = ver_w.max(p.version.len());
+        let status_str = if p.enabled { "Enabled" } else { "Disabled" };
+        stat_w = stat_w.max(status_str.len());
+
+        let targets_str = p
+            .targets
+            .iter()
+            .map(|t| match t {
+                crate::manifest::PackageTarget::Editor => "Editor",
+                crate::manifest::PackageTarget::Runtime => "Runtime",
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        targ_w = targ_w.max(targets_str.len());
+    }
+
+    cat_w += 2;
+    id_w += 2;
+    ver_w += 2;
+    stat_w += 2;
+    targ_w += 2;
+
+    let top = format!(
+        "┌{}┬{}┬{}┬{}┬{}┐",
+        "─".repeat(cat_w),
+        "─".repeat(id_w),
+        "─".repeat(ver_w),
+        "─".repeat(stat_w),
+        "─".repeat(targ_w)
+    );
+    let header = format!(
+        "│ {:<cat_len$} │ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+        "Category",
+        "Package ID",
+        "Version",
+        "Status",
+        "Targets",
+        cat_len = cat_w - 2,
+        id_len = id_w - 2,
+        ver_len = ver_w - 2,
+        stat_len = stat_w - 2,
+        targ_len = targ_w - 2
+    );
+    let sep = format!(
+        "├{}┼{}┼{}┼{}┼{}┤",
+        "─".repeat(cat_w),
+        "─".repeat(id_w),
+        "─".repeat(ver_w),
+        "─".repeat(stat_w),
+        "─".repeat(targ_w)
+    );
+    let bot = format!(
+        "└{}┴{}┴{}┴{}┴{}┘",
+        "─".repeat(cat_w),
+        "─".repeat(id_w),
+        "─".repeat(ver_w),
+        "─".repeat(stat_w),
+        "─".repeat(targ_w)
+    );
+
+    println!("    {top}");
+    println!("    {header}");
+    println!("    {sep}");
+    for p in packages {
+        let status_str = if p.enabled { "Enabled" } else { "Disabled" };
+        let targets_str = p
+            .targets
+            .iter()
+            .map(|t| match t {
+                crate::manifest::PackageTarget::Editor => "Editor",
+                crate::manifest::PackageTarget::Runtime => "Runtime",
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        println!(
+            "    │ {:<cat_len$} │ {:<id_len$} │ {:<ver_len$} │ {:<stat_len$} │ {:<targ_len$} │",
+            p.category,
+            p.id(),
+            p.version,
+            status_str,
+            targets_str,
+            cat_len = cat_w - 2,
+            id_len = id_w - 2,
+            ver_len = ver_w - 2,
+            stat_len = stat_w - 2,
+            targ_len = targ_w - 2
+        );
+    }
+    println!("    {bot}");
+}
+
+pub fn print_outdated_table(outdated: &[OutdatedInfo]) {
+    let mut id_w = 12;
+    let mut cur_w = 15;
+    let mut lat_w = 16;
+
+    for item in outdated {
+        id_w = id_w.max(item.id.len());
+        cur_w = cur_w.max(item.current_version.len());
+        lat_w = lat_w.max(item.latest_version.len());
+    }
+
+    id_w += 2;
+    cur_w += 2;
+    lat_w += 2;
+
+    let top = format!(
+        "┌{}┬{}┬{}┐",
+        "─".repeat(id_w),
+        "─".repeat(cur_w),
+        "─".repeat(lat_w)
+    );
+    let header = format!(
+        "│ {:<id_len$} │ {:<cur_len$} │ {:<lat_len$} │",
+        "Package ID",
+        "Current Version",
+        "Latest Compatible",
+        id_len = id_w - 2,
+        cur_len = cur_w - 2,
+        lat_len = lat_w - 2
+    );
+    let sep = format!(
+        "├{}┼{}┼{}┤",
+        "─".repeat(id_w),
+        "─".repeat(cur_w),
+        "─".repeat(lat_w)
+    );
+    let bot = format!(
+        "└{}┴{}┴{}┘",
+        "─".repeat(id_w),
+        "─".repeat(cur_w),
+        "─".repeat(lat_w)
+    );
+
+    println!("    {top}");
+    println!("    {header}");
+    println!("    {sep}");
+    for item in outdated {
+        println!(
+            "    │ {:<id_len$} │ {:<cur_len$} │ {:<lat_len$} │",
+            item.id,
+            item.current_version,
+            item.latest_version,
+            id_len = id_w - 2,
+            cur_len = cur_w - 2,
+            lat_len = lat_w - 2
+        );
+    }
+    println!("    {bot}");
+}
+
+pub fn print_releases_table(
+    package_id: &str,
+    releases: &[crate::manifest::ReleaseEntry],
+    installed_version: Option<&str>,
+) {
+    let mut ver_w = 15;
+    let mut magic_w = 13;
+    let mut chan_w = 7;
+    let mut stat_w = 11;
+
+    for r in releases {
+        ver_w = ver_w.max(r.version.len());
+        magic_w = magic_w.max(r.magic.len());
+        chan_w = chan_w.max(r.channel.len());
+    }
+
+    ver_w += 2;
+    magic_w += 2;
+    chan_w += 2;
+    stat_w += 2;
+
+    let top = format!(
+        "┌{}┬{}┬{}┬{}┐",
+        "─".repeat(ver_w),
+        "─".repeat(magic_w),
+        "─".repeat(chan_w),
+        "─".repeat(stat_w)
+    );
+    let header = format!(
+        "│ {:<ver_len$} │ {:<magic_len$} │ {:<chan_len$} │ {:<stat_len$} │",
+        "Package-Version",
+        "Magic-Version",
+        "Channel",
+        "Status",
+        ver_len = ver_w - 2,
+        magic_len = magic_w - 2,
+        chan_len = chan_w - 2,
+        stat_len = stat_w - 2
+    );
+    let sep = format!(
+        "├{}┼{}┼{}┼{}┤",
+        "─".repeat(ver_w),
+        "─".repeat(magic_w),
+        "─".repeat(chan_w),
+        "─".repeat(stat_w)
+    );
+    let bot = format!(
+        "└{}┴{}┴{}┴{}┘",
+        "─".repeat(ver_w),
+        "─".repeat(magic_w),
+        "─".repeat(chan_w),
+        "─".repeat(stat_w)
+    );
+
+    println!("    Releases for {package_id}:");
+    println!("    {top}");
+    println!("    {header}");
+    println!("    {sep}");
+    for r in releases {
+        let is_installed = Some(r.version.as_str()) == installed_version;
+        let status_str = if is_installed { "[Installed]" } else { "" };
+
+
+        let (v_cell, m_cell, c_cell, s_cell) = if is_installed {
+            (
+                format!("\x1b[1;32m{:<ver_len$}\x1b[0m", r.version, ver_len = ver_w - 2),
+                format!("\x1b[1;32m{:<magic_len$}\x1b[0m", r.magic, magic_len = magic_w - 2),
+                format!("\x1b[1;32m{:<chan_len$}\x1b[0m", r.channel, chan_len = chan_w - 2),
+                format!("\x1b[1;32m{:<stat_len$}\x1b[0m", status_str, stat_len = stat_w - 2),
+            )
+        } else {
+            (
+                format!("{:<ver_len$}", r.version, ver_len = ver_w - 2),
+                format!("{:<magic_len$}", r.magic, magic_len = magic_w - 2),
+                format!("{:<chan_len$}", r.channel, chan_len = chan_w - 2),
+                format!("{:<stat_len$}", status_str, stat_len = stat_w - 2),
+            )
+        };
+
+        println!(
+            "    │ {} │ {} │ {} │ {} │",
+            v_cell, m_cell, c_cell, s_cell
+        );
+    }
+    println!("    {bot}");
+}

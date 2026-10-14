@@ -1,7 +1,7 @@
+use crate::error::PackageError;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
-use crate::error::PackageError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackageTarget {
@@ -36,6 +36,8 @@ pub struct RawManifest {
     pub category: Option<String>,
     #[serde(default)]
     pub magic: Option<String>,
+    #[serde(default = "default_channel")]
+    pub channel: String, // (stable, preview, etc.)
     #[serde(default)]
     pub description: Option<String>,
     #[serde(default)]
@@ -48,6 +50,10 @@ pub struct RawManifest {
     pub targets: Vec<String>,
     #[serde(default)]
     pub dependencies: BTreeMap<String, String>,
+}
+
+fn default_channel() -> String {
+    "stable".to_string()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -110,4 +116,26 @@ impl ProjectPackagesManifest {
             source,
         })
     }
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PackageReleasesFile {
+    pub package: ReleasePackageMeta,
+    #[serde(default)]
+    pub releases: Vec<ReleaseEntry>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReleasePackageMeta {
+    pub id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ReleaseEntry {
+    pub version: String,
+    pub magic: String,
+    pub timestamp: u64,
+    #[serde(default = "default_channel")]
+    pub channel: String,
 }

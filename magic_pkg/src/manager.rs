@@ -1,5 +1,8 @@
 use crate::error::PackageError;
-use crate::manifest::{PackageManifest, PackageTarget, ProjectPackagesManifest, RawManifest};
+use crate::manifest::{
+    PackageManifest, PackageReleasesFile, PackageTarget, ProjectPackagesManifest, RawManifest,
+    ReleaseEntry, ReleasePackageMeta,
+};
 use crate::utils::{
     copy_dir_all, extract_zip_archive, file_name, find_crate_manifest, find_workspace_root,
     package_name, read_directories, update_editor_lib_register, update_manifest_dependencies,
@@ -10,6 +13,8 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
+
+const TAG: &str = "PackageManager";
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct SyncReport {
@@ -89,6 +94,210 @@ impl PackageManager {
         manifest.save_to_file(&self.packages_manifest)
     }
 
+    pub fn update_versions_file(package_root: &Path) -> Result<(), PackageError> {
+        let package_toml_path = package_root.join("package.toml");
+        let content = fs::read_to_string(&package_toml_path).map_err(|s| PackageError::Io {
+            path: package_toml_path.clone(),
+            source: s,
+        })?;
+        let raw: RawManifest = toml::from_str(&content).map_err(|s| PackageError::Manifest {
+            path: package_toml_path.clone(),
+            source: s,
+        })?;
+
+        let versions_path = package_root.join("versions.toml");
+        let mut versions_file = if versions_path.is_file() {
+            let c = fs::read_to_string(&versions_path).map_err(|s| PackageError::Io {
+                path: versions_path.clone(),
+                source: s,
+            })?;
+            toml::from_str::<PackageReleasesFile>(&c).unwrap_or(PackageReleasesFile {
+                package: ReleasePackageMeta {
+                    id: format!("{}/{}", raw.vendor.as_deref().unwrap_or("custom"), raw.name),
+                },
+                releases: Vec::new(),
+            })
+        } else {
+            PackageReleasesFile {
+                package: ReleasePackageMeta {
+                    id: format!("{}/{}", raw.vendor.as_deref().unwrap_or("custom"), raw.name),
+                },
+                releases: Vec::new(),
+            }
+        };
+
+        let now_timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+
+        let channel_str = raw.channel.clone();
+        let magic_ver = raw.magic.unwrap_or_else(|| "0.1.0".to_string());
+
+        if let Some(existing) = versions_file
+            .releases
+            .iter_mut()
+            .find(|r| r.version == raw.version)
+        {
+            existing.magic = magic_ver;
+            existing.timestamp = now_timestamp;
+            existing.channel = channel_str;
+        } else {
+            versions_file.releases.push(ReleaseEntry {
+                version: raw.version.clone(),
+                magic: magic_ver,
+                timestamp: now_timestamp,
+                channel: channel_str,
+            });
+        }
+
+        versions_file
+            .releases
+            .sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+        let serialized =
+            toml::to_string_pretty(&versions_file).map_err(|s| PackageError::InvalidManifest {
+                path: versions_path.clone(),
+                message: format!("Failed to serialize versions.toml: {s}"),
+            })?;
+
+        fs::write(&versions_path, serialized).map_err(|s| PackageError::Io {
+            path: versions_path.clone(),
+            source: s,
+        })?;
+
+        Ok(())
+    }
+
+    pub fn bump_package(&self, vendor: &str, name: &str) -> Result<(), PackageError> {
+        let packages = self.discover()?;
+        let pkg = packages
+            .iter()
+            .find(|p| p.vendor == vendor && p.name == name)
+            .ok_or_else(|| {
+                PackageError::InvalidArgument(format!("Package '{vendor}/{name}' not found"))
+            })?;
+        Self::update_versions_file(&pkg.root)
+    }
+
+    pub fn bump_all(&self) -> Result<usize, PackageError> {
+        let packages = self.discover()?;
+        let mut count = 0;
+        for pkg in packages {
+            Self::update_versions_file(&pkg.root)?;
+            count += 1;
+        }
+        Ok(count)
+    }
+
+    pub fn resolve_latest_compatible_version(
+        &self,
+        vendor: &str,
+        name: &str,
+    ) -> Result<String, PackageError> {
+        let workspace_root = find_workspace_root(&self.packages_root);
+        let engine_version = crate::utils::get_workspace_engine_version(&workspace_root)
+            .unwrap_or_else(|| "0.1.0".to_string());
+
+        let url_main = format!(
+            "https://raw.githubusercontent.com/{}/{}/main/versions.toml",
+            vendor, name
+        );
+        let url_master = format!(
+            "https://raw.githubusercontent.com/{}/{}/master/versions.toml",
+            vendor, name
+        );
+
+        let content_res = ureq::get(&url_main)
+            .call()
+            .and_then(|res| res.into_body().read_to_string());
+        let content = match content_res {
+            Ok(c) => c,
+            Err(_) => ureq::get(&url_master)
+                .call()
+                .map_err(|e| {
+                    PackageError::DownloadError(format!(
+                        "Failed to fetch versions.toml for {}/{}: {}",
+                        vendor, name, e
+                    ))
+                })?
+                .into_body()
+                .read_to_string()
+                .map_err(|e| PackageError::DownloadError(e.to_string()))?,
+        };
+
+        let releases_file: PackageReleasesFile =
+            toml::from_str(&content).map_err(|s| PackageError::InvalidManifest {
+                path: PathBuf::from("versions.toml"),
+                message: format!("Failed to parse remote versions.toml: {s}"),
+            })?;
+
+        let mut releases = releases_file.releases;
+
+        releases.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+        for release in &releases {
+            if release.magic == engine_version && release.channel == "stable" {
+                return Ok(release.version.clone());
+            }
+        }
+
+        for release in &releases {
+            if release.magic == engine_version {
+                return Ok(release.version.clone());
+            }
+        }
+
+        Err(PackageError::InvalidManifest {
+            path: self.packages_manifest.clone(),
+            message: format!(
+                "No compatible version found for package {}/{} with engine version '{}'",
+                vendor, name, engine_version
+            ),
+        })
+    }
+
+    pub fn get_package_releases(
+        &self,
+        vendor: &str,
+        name: &str,
+    ) -> Result<PackageReleasesFile, PackageError> {
+        let url_main = format!(
+            "https://raw.githubusercontent.com/{}/{}/main/versions.toml",
+            vendor, name
+        );
+        let url_master = format!(
+            "https://raw.githubusercontent.com/{}/{}/master/versions.toml",
+            vendor, name
+        );
+
+        let content_res = ureq::get(&url_main)
+            .call()
+            .and_then(|res| res.into_body().read_to_string());
+        let content = match content_res {
+            Ok(c) => c,
+            Err(_) => ureq::get(&url_master)
+                .call()
+                .map_err(|e| {
+                    PackageError::DownloadError(format!(
+                        "Failed to fetch versions.toml for {}/{}: {}",
+                        vendor, name, e
+                    ))
+                })?
+                .into_body()
+                .read_to_string()
+                .map_err(|e| PackageError::DownloadError(e.to_string()))?,
+        };
+
+        let releases_file: PackageReleasesFile =
+            toml::from_str(&content).map_err(|s| PackageError::InvalidManifest {
+                path: PathBuf::from("versions.toml"),
+                message: format!("Failed to parse remote versions.toml: {s}"),
+            })?;
+
+        Ok(releases_file)
+    }
+
     pub fn install_from_zip(&self, zip_path: &Path) -> Result<PackageManifest, PackageError> {
         let temp_dir = std::env::temp_dir().join(format!("magic_install_{}", uuid_lite()));
         let _ = fs::remove_dir_all(&temp_dir);
@@ -152,7 +361,7 @@ impl PackageManager {
         let cache_dir = Self::global_cache_dir().join(vendor).join(&raw.name);
         let _ = fs::create_dir_all(&cache_dir);
         let cache_zip_target = cache_dir.join(format!("{}.zip", raw.version));
-        
+
         if zip_path != cache_zip_target {
             let _ = fs::copy(zip_path, &cache_zip_target);
         }
@@ -177,7 +386,7 @@ impl PackageManager {
     }
 
     pub fn install_from_url(&self, url: &str) -> Result<PackageManifest, PackageError> {
-        magic_core::mgprint!("PackageManager", "Downloading package from {} ...", url);
+        magic_core::mgprint!(TAG, "Downloading package from {} ...", url);
         let response = ureq::get(url)
             .call()
             .map_err(|e| PackageError::DownloadError(e.to_string()))?;
@@ -238,8 +447,27 @@ impl PackageManager {
         result
     }
 
-    pub fn install_repo(&self, vendor: &str, name: &str, version_tag: &str) -> Result<PackageManifest, PackageError> {
-        let clean_version = version_tag.strip_prefix('v').unwrap_or(version_tag);
+    pub fn install_repo(
+        &self,
+        vendor: &str,
+        name: &str,
+        version_tag: &str,
+    ) -> Result<PackageManifest, PackageError> {
+        let resolved_version = if version_tag.is_empty() || version_tag == "latest" {
+            magic_core::mgprint!(
+                TAG,
+                "Resolving latest compatible version for {}/{} ...",
+                vendor,
+                name
+            );
+            self.resolve_latest_compatible_version(vendor, name)?
+        } else {
+            version_tag.to_string()
+        };
+
+        let clean_version = resolved_version
+            .strip_prefix('v')
+            .unwrap_or(&resolved_version);
         let cached_zip = Self::global_cache_dir()
             .join(vendor)
             .join(name)
@@ -247,7 +475,7 @@ impl PackageManager {
 
         if cached_zip.is_file() {
             magic_core::mgprint!(
-                "PackageManager",
+                TAG,
                 "Installing package {}/{} v{} from local cache ({}) ...",
                 vendor,
                 name,
@@ -257,10 +485,10 @@ impl PackageManager {
             return self.install_from_zip(&cached_zip);
         }
 
-        let tag = if version_tag.starts_with('v') {
-            version_tag.to_string()
+        let tag = if resolved_version.starts_with('v') {
+            resolved_version
         } else {
-            format!("v{}", version_tag)
+            format!("v{}", resolved_version)
         };
 
         let url = format!(
@@ -322,7 +550,9 @@ impl PackageManager {
 
                 if !exists {
                     missing_or_new = true;
-                    if version_or_url.starts_with("http://") || version_or_url.starts_with("https://") {
+                    if version_or_url.starts_with("http://")
+                        || version_or_url.starts_with("https://")
+                    {
                         self.install_from_url(&version_or_url)?;
                     } else {
                         self.install_repo(vendor, name, &version_or_url)?;
@@ -336,7 +566,9 @@ impl PackageManager {
             for package in &packages {
                 let key = format!("{}/{}", package.vendor, package.name);
                 if !proj_manifest.dependencies.contains_key(&key) {
-                    proj_manifest.dependencies.insert(key, package.version.clone());
+                    proj_manifest
+                        .dependencies
+                        .insert(key, package.version.clone());
                     proj_manifest_updated = true;
                 }
 
@@ -475,7 +707,7 @@ impl PackageManager {
             .join(", ");
 
         let manifest = format!(
-            "name = \"{name}\"\nvendor = \"{vendor}\"\nversion = \"0.1.0\"\ncategory = \"{category}\"\nmagic = \"{magic_version}\"\ndescription = \"Write your package description here\"\nkeywords = []\nstatus = \"enabled\"\ntargets = [{target_values}]\n\n[dependencies]\n"
+            "name = \"{name}\"\nvendor = \"{vendor}\"\nversion = \"0.1.0\"\ncategory = \"{category}\"\nmagic = \"{magic_version}\"\nchannel = \"stable\"\ndescription = \"Write your package description here\"\nkeywords = []\nstatus = \"enabled\"\ntargets = [{target_values}]\n\n[dependencies]\n"
         );
         fs::write(root.join("package.toml"), manifest).map_err(|source| PackageError::Io {
             path: root.join("package.toml"),
@@ -485,6 +717,9 @@ impl PackageManager {
         for target in &targets {
             self.write_target_template(&root, vendor, name, *target)?;
         }
+
+
+        let _ = Self::update_versions_file(&root);
 
         let mut proj_manifest = self.load_project_manifest()?;
         proj_manifest
