@@ -2,4 +2,4 @@
 
 **The magic of MagicBevy began with Bevy, but it doesn’t end with it.**
 
-A modular and customizable editor and development framework for building games.
+MagicBevy is a modular game engine built around a package-driven architecture, designed for lightweight workflows and AI-assisted game development.
