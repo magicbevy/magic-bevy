@@ -718,7 +718,6 @@ impl PackageManager {
             self.write_target_template(&root, vendor, name, *target)?;
         }
 
-
         let _ = Self::update_versions_file(&root);
 
         let mut proj_manifest = self.load_project_manifest()?;
@@ -869,9 +868,14 @@ impl PackageManager {
             crate::utils::cargo_identifier(name),
             target.manifest_value()
         );
+
+        let workspace_root = find_workspace_root(&self.packages_root);
+        let core_path = workspace_root.join("magic_core");
+        let rel_core_path = crate::utils::relative_path(&target_root, &core_path);
+        let core_path_str = crate::utils::toml_path(&rel_core_path);
+
         let cargo_toml = format!(
-            "{}\n[package]\nname = \"{crate_name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\n",
-            crate::utils::AUTO_HEADER
+            "[package]\nname = \"{crate_name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\n\n[dependencies]\nmagic_core = {{ path = \"{core_path_str}\" }}\n",
         );
         fs::write(target_root.join("Cargo.toml"), cargo_toml).map_err(|source| {
             PackageError::Io {
@@ -879,11 +883,21 @@ impl PackageManager {
                 source,
             }
         })?;
-        let source = "pub fn register<T>(_manager: &mut T) {}\n";
+
+        let source = match target {
+            PackageTarget::Editor => {
+                "use magic_core::api::EditorRegistry;\n\npub fn register(_registry: &mut EditorRegistry) {}\n"
+            }
+            PackageTarget::Runtime => {
+                "use magic_core::api::RuntimeRegistry;\n\npub fn register(_registry: &mut RuntimeRegistry) {}\n"
+            }
+        };
+
         fs::write(source_root.join("lib.rs"), source).map_err(|source| PackageError::Io {
             path: source_root.join("lib.rs"),
             source,
-        })
+        })?;
+        Ok(())
     }
 
     fn read_manifest(

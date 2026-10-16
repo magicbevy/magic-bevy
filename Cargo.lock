@@ -2142,6 +2142,9 @@ dependencies = [
 [[package]]
 name = "magic_pkg_editor"
 version = "0.1.0"
+dependencies = [
+ "magic_core",
+]
 
 [[package]]
 name = "malloc_buf"

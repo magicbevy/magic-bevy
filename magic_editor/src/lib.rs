@@ -3,7 +3,7 @@ pub mod systems;
 
 pub use systems::{EditorSystem, SystemManager};
 
-use magic_core::*;
+use magic_core::EditorRegistry;
 
 #[unsafe(no_mangle)]
 pub extern "Rust" fn register_all_packages(registry: &mut EditorRegistry) {
