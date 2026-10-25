@@ -3,6 +3,7 @@ pub mod status;
 pub mod compiler;
 pub mod ui;
 pub mod package_manager;
+pub mod default_menus;
 #[macro_use]
 pub mod logger;
 pub use colored;

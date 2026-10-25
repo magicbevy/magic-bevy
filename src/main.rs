@@ -110,9 +110,9 @@ impl MagicBevyApp {
 
     fn mock_packages(&mut self) {
         self.menu_registry
-            .register("File", "Save Scene", Box::new(|| println!("Scene Saved!")));
+            .register_action(&["file"], "Save Scene", Box::new(|| println!("Scene Saved!")));
         self.menu_registry
-            .register("File", "Exit", Box::new(|| std::process::exit(0)));
+            .register_action(&["file"], "Exit", Box::new(|| std::process::exit(0)));
     }
 
     fn init_file_watcher(

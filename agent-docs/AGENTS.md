@@ -12,6 +12,9 @@ This folder contains documentation for AI agents working on the MagicBevy projec
 | `workflows.md` | Step-by-step workflows: hot-reload, package init/sync/install/update/bump |
 | `key-files.md` | Quick reference to all important files and exported symbols |
 | `coding-conventions.md` | Naming, formatting, logging, error handling, concurrency, unsafe rules |
+| `dev-status/STATUS.md` | Current dev phase, completed/in-progress items, file changes, build status |
+| `dev-status/CHECKLIST.md` | Checklist before declaring a feature complete |
+| `dev-status/AGENT_RULES.md` | Agent rules for updating docs after code changes |
 
 ## How to Use
 
@@ -35,7 +38,7 @@ This folder contains documentation for AI agents working on the MagicBevy projec
 
 | Task | Where to look |
 |------|---------------|
-| Add a menu item | `magic_core/src/api/menu.rs` + `src/main.rs` `mock_packages()` |
+| Add a menu item | `magic_core/src/api/menu.rs` — `register_action(&["file"], "Save Scene", cb)` or `register_action(&["file", "recent"], "Scene 1", cb)` for nested submenus |
 | Add compile event callback | `magic_core/src/api/events.rs` |
 | Change compile status UI | `magic_core/src/ui/indicator.rs` + `top_bar.rs` |
 | Add a new package | `magic_pkg init` → `magic_pkg sync` |
