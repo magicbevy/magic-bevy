@@ -2,19 +2,20 @@
 
 ## `magic-bevy` (root crate)
 
-**Path:** `/src/main.rs`  
+**Path:** `/src/main.rs` (entry point) + `/src/app.rs`, `/src/hot_reload.rs`, `/src/windows.rs`, `/src/layouts.rs`  
 **Type:** binary (eframe app)  
-**Dependencies:** `magic_core`, `eframe`, `egui`, `notify`, `libloading`, `colored`
+**Dependencies:** `magic_core`, `magic_pkg`, `eframe`, `egui`, `notify`, `libloading`, `colored`
 
-Key components:
-- `MagicBevyApp` — main application state
-- `CompilerMessage` — IPC between compiler thread and UI
-- `reload_and_load_library()` — loads editor cdylib via `libloading`, calls `register_all_packages`
-- `mock_packages()` — registers built-in "File > Save Scene" and "File > Exit" menu items
-- `init_file_watcher()` — sets up `notify` watcher on `./packages` and `./magic_editor`
-- `execute_compile()` — spawns thread to run `cargo check` + `cargo build`
+### Modules
 
-**Do not modify unless:** changing app entry point, window size, title, or hot-reload logic.
+| Module | File | Purpose |
+|--------|------|---------|
+| `app` | `src/app.rs` | `MagicBevyApp` struct, `new()`, `update()`, `reload_and_load_library()`, `mock_packages()`, `eframe::App` impl |
+| `hot_reload` | `src/hot_reload.rs` | `CompilerMessage` enum, `execute_compile()`, `init_file_watcher()` |
+| `windows` | `src/windows.rs` | `WindowManager`, `open_window()`, `render_windows()` |
+| `layouts` | `src/layouts.rs` | `LayoutManager`, `save_layout()`, `load_layout()`, `list_layouts()` |
+
+**Do not modify unless:** changing app entry point, window size, title, hot-reload logic, window management, or layout save/load.
 
 ---
 

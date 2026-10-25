@@ -7,6 +7,7 @@ pub mod default_menus;
 #[macro_use]
 pub mod logger;
 pub use colored;
+pub use egui;
 
 pub use api::*;
 pub use status::CompilerStateManager;

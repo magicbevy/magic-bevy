@@ -13,9 +13,11 @@ edition = "2024"
 
 [dependencies]
 magic_core = { path = "magic_core" }
+magic_pkg = { path = "magic_pkg" }
 
 libloading = "0.8"
-eframe = "0.30"
-egui = "0.33.3"
+eframe = "0.36"
+egui = "0.36"
+egui_dock = "0.21"
 notify = "8.1.0"
 colored = "3.1.1"

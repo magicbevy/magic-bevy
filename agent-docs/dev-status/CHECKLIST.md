@@ -15,6 +15,26 @@
 - [ ] Menu hierarchy renders correctly in UI
 - [ ] Hot-reload still works after menu changes
 
+## Feature-Specific Verification
+
+### Console/Debug Log Window
+- [ ] Window opens from Window menu
+- [ ] Shows compiler messages with timestamps
+- [ ] Shows package sync output
+- [ ] Severity colors (Info=blue, Warning=yellow, Error=red)
+
+### Package Manager Window
+- [ ] Window opens from Window menu
+- [ ] Lists installed packages with versions
+- [ ] Install/Remove/Enable/Disable actions work
+- [ ] Check for updates works
+
+### File Manager Window
+- [ ] Window opens from Window menu
+- [ ] Navigates project folders
+- [ ] Open/create/delete files works
+
+
 ## Agent Update Rules
 
 When the agent makes any change:

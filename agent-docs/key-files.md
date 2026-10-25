@@ -6,7 +6,11 @@
 |------|---------|
 | `Cargo.toml` | Workspace definition + root crate deps (libloading, eframe, egui, notify, colored) |
 | `Cargo.lock` | Locked dependency tree (auto-generated) |
-| `src/main.rs` | Application entry point, hot-reload logic, file watcher, UI |
+| `src/main.rs` | Application entry point (module declarations + `main()`) |
+| `src/app.rs` | `MagicBevyApp` struct, lifecycle, `eframe::App` impl |
+| `src/hot_reload.rs` | `CompilerMessage`, compile logic, file watcher |
+| `src/windows.rs` | `WindowManager`, window open/render |
+| `src/layouts.rs` | `LayoutManager`, save/load/list layouts |
 | `packages/packages.toml` | Project package manifest (dependencies map) |
 | `.cargo/config.toml` | Linker (clang + mold), rustc-wrapper (sccache) |
 | `.gitignore` | Git ignore rules (target, debug, .rs.bk, *.pdb, mutants.out) |
@@ -24,8 +28,9 @@
 | `src/api/mod.rs` | API module re-exports |
 | `src/api/editor.rs` | `EditorRegistry` struct |
 | `src/api/events.rs` | `EditorEventRegistry` (compile callbacks) |
-| `src/api/menu.rs` | `MenuRegistry` + `MenuCommand` |
+| `src/api/menu.rs` | `MenuRegistry` + `MenuItem` + `MenuEntry` |
 | `src/api/runtime.rs` | `RuntimeRegistry` (minimal) |
+| `src/api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstance`, `WindowInstances` |
 | `src/status/compiler_state.rs` | `CompileStatus` enum + `CompilerStateManager` |
 | `src/ui/top_bar.rs` | `draw_top_bar()` — egui top panel |
 | `src/ui/indicator.rs` | `draw_status_indicator()` — LED + text |
