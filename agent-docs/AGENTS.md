@@ -13,8 +13,6 @@ This folder contains documentation for AI agents working on the MagicBevy projec
 | `key-files.md` | Quick reference to all important files and exported symbols |
 | `coding-conventions.md` | Naming, formatting, logging, error handling, concurrency, unsafe rules |
 | `dev-status/STATUS.md` | Current dev phase, completed/in-progress items, file changes, build status |
-| `dev-status/CHECKLIST.md` | Checklist before declaring a feature complete |
-| `dev-status/AGENT_RULES.md` | Agent rules for updating docs after code changes |
 
 ## How to Use
 
@@ -38,11 +36,10 @@ This folder contains documentation for AI agents working on the MagicBevy projec
 
 | Task | Where to look |
 |------|---------------|
-| Add a menu item | `magic_core/src/api/menu.rs` — `register_action(&["file"], "Save Scene", cb)` or `register_action(&["file", "recent"], "Scene 1", cb)` for nested submenus |
-| Add compile event callback | `magic_core/src/api/events.rs` |
-| Change compile status UI | `magic_core/src/ui/indicator.rs` + `top_bar.rs` |
-| Add a new package | `magic_pkg init` → `magic_pkg sync` |
-| Modify hot-reload trigger | `src/main.rs` `init_file_watcher()` / `execute_compile()` |
+| Change top bar height / dock controls | `magic_core/src/ui/top_bar.rs` — `ui.set_min_height()`, `draw_top_bar()` returns `LayoutAction` |
+| Add dockable window | `magic_core/src/api/window.rs` — `WindowRegistry::register()` + `WindowTab` |
+| Save/load layout | `src/windows.rs` — `save_layout_named()`, `load_layout_named()` |
+| Hot-reload on file change | `src/hot_reload.rs` — `init_file_watcher()`, `execute_compile()` |
 | Add editor system | `magic_editor/src/systems/system.rs` + `manager.rs` |
 | Change package manifest format | `magic_pkg/src/manifest.rs` |
 | Add new CLI subcommand | `magic_pkg/src/main.rs` + `magic_pkg/src/manager.rs` |

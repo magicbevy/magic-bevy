@@ -19,6 +19,10 @@ pub struct MagicBevyApp {
     is_compiling: Arc<Mutex<bool>>,
     _watcher: notify::RecommendedWatcher,
     current_lib: Option<libloading::Library>,
+    save_name: String,
+    show_save_dialog: bool,
+    delete_confirm: Option<(String, bool)>,
+    current_layout_name: Option<String>,
 }
 
 impl MagicBevyApp {
@@ -45,6 +49,10 @@ impl MagicBevyApp {
             is_compiling,
             _watcher: watcher,
             current_lib: None,
+            save_name: String::new(),
+            show_save_dialog: false,
+            delete_confirm: None,
+            current_layout_name: None,
         };
 
         app.compiler_manager.set_success();
@@ -67,6 +75,32 @@ impl MagicBevyApp {
         );
 
         EngineCompilerState::global().unlock_watcher();
+
+        // Load temp layout if exists, otherwise load active layout
+        let temp_loaded = app.window_manager.load_temp_layout(&app.windows);
+        if temp_loaded {
+            app.current_layout_name = None;
+        } else {
+            let (active_name, is_global, is_project) = {
+                let name = app.window_manager.get_active_layout().map(|s| s.to_string());
+                match name {
+                    Some(n) => {
+                        let ig = app.window_manager.layout_manager.is_global_layout(&n);
+                        let ip = app.window_manager.layout_manager.is_project_layout(&n);
+                        (Some(n), ig, ip)
+                    }
+                    None => (None, false, false),
+                }
+            };
+            if let Some(n) = active_name {
+                app.current_layout_name = Some(n.clone());
+                if is_global || is_project {
+                    app.window_manager.load_layout_named(&app.windows, &n, is_global);
+                }
+            } else {
+                app.current_layout_name = None;
+            }
+        }
         app
     }
 
@@ -117,8 +151,9 @@ impl MagicBevyApp {
                         }
 
                         // Add layout management items
-                        let layouts = self.window_manager.layout_manager.list_layouts();
-                        for layout_name in layouts {
+                        let project_layouts = self.window_manager.list_project_layouts();
+                        let global_layouts = self.window_manager.list_global_layouts();
+                        for layout_name in project_layouts.iter().chain(global_layouts.iter()) {
                             self.menu_registry.register_action(
                                 &["window", "Layouts"],
                                 &format!("Load {}", layout_name),
@@ -261,18 +296,53 @@ impl eframe::App for MagicBevyApp {
 
         // --- Top bar with menus ---
         let ctx = (*ui.ctx()).clone();
-        draw_top_bar(&ctx, ui, &self.menu_registry, &self.compiler_manager.status);
+        let project_layouts = self.window_manager.list_project_layouts();
+        let global_layouts = self.window_manager.list_global_layouts();
+        let layout_action = draw_top_bar(
+            &ctx,
+            ui,
+            &self.menu_registry,
+            &self.compiler_manager.status,
+            &project_layouts,
+            &global_layouts,
+            &mut self.current_layout_name,
+            &mut self.save_name,
+            &mut self.show_save_dialog,
+            &mut self.delete_confirm,
+        );
+
+        match layout_action {
+            LayoutAction::Save { name, is_global } => {
+                if name.is_empty() {
+                    let name = format!(
+                        "layout_{}",
+                        std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .unwrap()
+                            .as_secs()
+                    );
+                    self.window_manager.save_layout_named(&name, is_global);
+                } else {
+                    self.window_manager.save_layout_named(&name, is_global);
+                }
+                self.window_manager.set_active_layout(&name);
+                self.current_layout_name = Some(name.clone());
+            }
+            LayoutAction::Load { name, is_global } => {
+                self.window_manager.load_layout_named(&self.windows, &name, is_global);
+                self.window_manager.set_active_layout(&name);
+                self.current_layout_name = Some(name.clone());
+            }
+            LayoutAction::Delete { name, is_global } => {
+                self.window_manager.delete_layout(&name, is_global);
+                if self.current_layout_name.as_ref() == Some(&name.to_string()) {
+                    self.current_layout_name = None;
+                }
+            }
+            LayoutAction::None => {}
+        }
 
         // --- Render all open windows ---
-        self.window_manager.render_windows(ui.ctx(), &mut self.windows);
-
-        // --- Central panel (empty background) ---
-        egui::CentralPanel::default().show(ui, |_ui| {
-            // Background is empty, windows float on top
-        });
+        self.window_manager.render_windows(ui, &mut self.windows);
     }
-}
-
-pub(crate) fn source(instance_id: u64) -> egui::Id {
-    egui::Id::new(format!("window_instance_{}", instance_id))
 }

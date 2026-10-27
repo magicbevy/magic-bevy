@@ -12,4 +12,4 @@ pub use egui;
 pub use api::*;
 pub use status::CompilerStateManager;
 pub use compiler::{CompilerLockMode, EngineCompilerState};
-pub use ui::top_bar::draw_top_bar;
+pub use ui::top_bar::{draw_top_bar, LayoutAction};

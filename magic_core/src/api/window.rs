@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 pub type WindowId = String;
 
 pub trait EditorWindow: Send + Sync {
@@ -39,6 +41,12 @@ impl WindowRegistry {
     pub fn find_descriptor(&self, window_id: &str) -> Option<&WindowDescriptor> {
         self.descriptors.iter().find(|d| d.id == window_id)
     }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub struct WindowTab {
+    pub window_id: WindowId,
+    pub instance_id: u64,
 }
 
 pub struct WindowInstance {

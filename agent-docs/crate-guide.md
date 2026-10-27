@@ -10,12 +10,12 @@
 
 | Module | File | Purpose |
 |--------|------|---------|
-| `app` | `src/app.rs` | `MagicBevyApp` struct, `new()`, `update()`, `reload_and_load_library()`, `mock_packages()`, `eframe::App` impl |
+| `app` | `src/app.rs` | `MagicBevyApp` struct, `new()`, `ui()`, `reload_and_load_library()`, `mock_packages()`, `eframe::App` impl |
 | `hot_reload` | `src/hot_reload.rs` | `CompilerMessage` enum, `execute_compile()`, `init_file_watcher()` |
-| `windows` | `src/windows.rs` | `WindowManager`, `open_window()`, `render_windows()` |
+| `windows` | `src/windows.rs` | `WindowManager`, `DockState<WindowTab>`, `WindowTabViewer`, `open_window()`, `save_layout_named()`, `load_layout_named()` |
 | `layouts` | `src/layouts.rs` | `LayoutManager`, `save_layout()`, `load_layout()`, `list_layouts()` |
 
-**Do not modify unless:** changing app entry point, window size, title, hot-reload logic, window management, or layout save/load.
+**Do not modify unless:** changing app entry point, window size, title, hot-reload logic, window management, layout save/load, or dock state.
 
 ---
 
@@ -32,15 +32,16 @@
 | `api` | `api/mod.rs` | Re-exports `EditorRegistry`, `EditorEventRegistry`, `MenuRegistry`, `RuntimeRegistry` |
 | `api/editor` | `api/editor.rs` | `EditorRegistry<'a>` — menu + events references passed to packages |
 | `api/events` | `api/events.rs` | `EditorEventRegistry` — compile start/success callbacks |
-| `api/menu` | `api/menu.rs` | `MenuRegistry` — BTreeMap of menu name → commands |
+| `api/menu` | `api/menu.rs` | `MenuRegistry` — hierarchical menu structure (Action, Submenu, Separator) |
+| `api/window` | `api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstance`, `WindowInstances`, `WindowTab` |
 | `api/runtime` | `api/runtime.rs` | `RuntimeRegistry<'a>` — minimal, future use |
 | `compiler` | `compiler.rs` | `EngineCompilerState` global singleton (lock mode, reload request) |
 | `logger` | `logger.rs` | Colored print macros (`mgprint!`, `mgwarn!`, `mgerror!`, `mgsuccess!`) |
 | `status` | `status/mod.rs` | `CompilerStateManager`, `CompileStatus` enum |
 | `status/compiler_state` | `status/compiler_state.rs` | `CompileStatus` variants + `CompilerStateManager` |
 | `ui` | `ui/mod.rs` | Re-exports `top_bar`, `indicator` |
-| `ui/top_bar` | `ui/top_bar.rs` | `draw_top_bar()` — renders egui top panel with menus + status |
-| `ui/indicator` | `ui/indicator.rs` | `draw_status_indicator()` — LED circle + text for compile status |
+| `ui/top_bar` | `ui/top_bar.rs` | `draw_top_bar()` — egui top panel, returns `LayoutAction` for save/load |
+| `ui/indicator` | `ui/indicator.rs` | `draw_status_indicator()` — blinking LED + text for compile status |
 | `loader` | `loader/mod.rs` | `PackageManager` (editor lib loader), `PackageReloader` (legacy) |
 | `loader/editor_lib` | `loader/editor_lib.rs` | Loads `libmagic_editor.so`, extracts `create_system` symbol |
 | `loader/package_reloader` | `loader/package_reloader.rs` | Reads `package.toml` (legacy, not used in main flow) |

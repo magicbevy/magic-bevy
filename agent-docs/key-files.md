@@ -30,9 +30,9 @@
 | `src/api/events.rs` | `EditorEventRegistry` (compile callbacks) |
 | `src/api/menu.rs` | `MenuRegistry` + `MenuItem` + `MenuEntry` |
 | `src/api/runtime.rs` | `RuntimeRegistry` (minimal) |
-| `src/api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstance`, `WindowInstances` |
+| `src/api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstance`, `WindowInstances`, `WindowTab` |
 | `src/status/compiler_state.rs` | `CompileStatus` enum + `CompilerStateManager` |
-| `src/ui/top_bar.rs` | `draw_top_bar()` — egui top panel |
+| `src/ui/top_bar.rs` | `draw_top_bar()` — egui top panel with dock controls, returns `LayoutAction` |
 | `src/ui/indicator.rs` | `draw_status_indicator()` — LED + text |
 | `src/loader/editor_lib.rs` | `PackageManager` — loads editor cdylib |
 | `src/loader/package_reloader.rs` | `PackageReloader` — reads `package.toml` (legacy) |

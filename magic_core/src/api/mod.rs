@@ -8,4 +8,4 @@ pub use editor::EditorRegistry;
 pub use events::EditorEventRegistry;
 pub use menu::{MenuItem, MenuRegistry};
 pub use runtime::RuntimeRegistry;
-pub use window::{EditorWindow, WindowDescriptor, WindowFactory, WindowId, WindowRegistry, WindowInstance, WindowInstances};
+pub use window::{EditorWindow, WindowDescriptor, WindowFactory, WindowId, WindowRegistry, WindowInstance, WindowInstances, WindowTab};

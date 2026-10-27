@@ -17,7 +17,6 @@ The agent must complete ALL of the following before telling the user a task is d
 - [ ] `cargo check` runs without errors
 - [ ] `cargo check` runs without new warnings
 - [ ] `agent-docs/dev-status/STATUS.md` is updated
-- [ ] `agent-docs/dev-status/CHECKLIST.md` is followed
 - [ ] Agent documentation (`agent-docs/`) is updated if APIs changed
 
 ## Commit Convention
