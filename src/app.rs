@@ -65,6 +65,7 @@ impl MagicBevyApp {
             }
             Err(err) => {
                 mgwarn!("PackageSync", "Sync failed: {}", err);
+                magic_core::oracle_error!("PackageSync", "Sync failed: {}", err);
             }
         }
 
@@ -190,69 +191,30 @@ impl MagicBevyApp {
         self.menu_registry
             .register_action(&["file"], "Exit", Box::new(|| std::process::exit(0)));
 
-        // Test window to verify window system works
+        // Oracle Logs window
         self.windows.register(
             WindowDescriptor {
-                id: "test/console".to_string(),
-                label: "Test Console".to_string(),
-                default_width: 400.0,
-                default_height: 300.0,
+                id: "oracle_logs".to_string(),
+                label: "Oracle Logs".to_string(),
+                default_width: 600.0,
+                default_height: 400.0,
                 dockable: true,
             },
             WindowFactory {
                 create: Box::new(|| {
-                    Box::new(TestConsoleWindow::new()) as Box<dyn EditorWindow>
+                    Box::new(OracleLogsWindow::new()) as Box<dyn EditorWindow>
                 }),
             },
         );
 
-        // Add menu item for test console
         let tx = self.window_manager.tx.clone();
         self.menu_registry.register_action(
             &["window"],
-            "Open Test Console",
+            "Open Oracle Logs",
             Box::new(move || {
-                let _ = tx.send("test/console".to_string());
+                let _ = tx.send("oracle_logs".to_string());
             }),
         );
-    }
-}
-
-struct TestConsoleWindow {
-    messages: Vec<String>,
-}
-
-impl TestConsoleWindow {
-    fn new() -> Self {
-        Self {
-            messages: vec![
-                "[INFO] MagicBevy started".to_string(),
-                "[INFO] Window system initialized".to_string(),
-                "[INFO] Test console window ready".to_string(),
-            ],
-        }
-    }
-}
-
-impl EditorWindow for TestConsoleWindow {
-    fn id(&self) -> WindowId {
-        "test/console".to_string()
-    }
-
-    fn title(&self) -> &str {
-        "Test Console"
-    }
-
-    fn draw(&mut self, ui: &mut egui::Ui) {
-        ui.heading("Test Console");
-        ui.separator();
-        for msg in &self.messages {
-            ui.label(msg);
-        }
-        ui.separator();
-        if ui.button("Add Log Entry").clicked() {
-            self.messages.push("[INFO] New log entry".to_string());
-        }
     }
 }
 
@@ -283,8 +245,9 @@ impl eframe::App for MagicBevyApp {
                     self.compiler_manager.set_success();
                     self.reload_and_load_library();
                 }
-                CompilerMessage::CompileError(_err) => {
-                    self.compiler_manager.set_error("Error");
+                CompilerMessage::CompileError(err) => {
+                    self.compiler_manager.set_error(&err);
+                    magic_core::oracle_error!("HotReload", "Compile error: {}", err);
                 }
             }
         }
@@ -318,8 +281,8 @@ impl eframe::App for MagicBevyApp {
                         "layout_{}",
                         std::time::SystemTime::now()
                             .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap()
-                            .as_secs()
+                            .map(|d| d.as_secs())
+                            .unwrap_or(0)
                     );
                     self.window_manager.save_layout_named(&name, is_global);
                 } else {

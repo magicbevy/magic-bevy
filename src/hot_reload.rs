@@ -43,18 +43,26 @@ pub fn execute_compile(
 
         if let Ok(output) = check_output {
             if output.status.success() {
-                let build_status = Command::new("cargo")
+                let build_output = Command::new("cargo")
                     .args(["build", "-p", "magic_editor", "--lib"])
-                    .status();
+                    .output();
 
-                if build_status.is_ok() && build_status.unwrap().success() {
+                if build_output.is_ok() && build_output.as_ref().unwrap().status.success() {
                     let _ = tx.send(CompilerMessage::CompileSuccess);
                 } else {
-                    let _ = tx.send(CompilerMessage::CompileError("Build failed.".to_string()));
+                    let err = if let Ok(out) = build_output {
+                        String::from_utf8_lossy(&out.stderr).to_string()
+                    } else {
+                        "Build failed: unable to capture cargo output.".to_string()
+                    };
+                    let _ = tx.send(CompilerMessage::CompileError(
+                        format!("Build failed.\n{}", err),
+                    ));
                 }
             } else {
+                let err = String::from_utf8_lossy(&output.stderr).to_string();
                 let _ = tx.send(CompilerMessage::CompileError(
-                    "Cargo check failed.".to_string(),
+                    format!("Cargo check failed.\n{}", err),
                 ));
             }
         } else {
@@ -150,7 +158,10 @@ pub fn init_file_watcher(
             }
         }
     })
-    .unwrap();
+    .unwrap_or_else(|e| {
+        magic_core::oracle_error!("HotReload", "Failed to create file watcher: {}", e);
+        panic!("file watcher creation failed: {}", e);
+    });
 
     let packages_path = Path::new("./packages");
     if packages_path.exists() {

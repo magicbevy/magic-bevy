@@ -45,6 +45,9 @@ pub fn draw_top_bar(
     delete_confirm: &mut Option<(String, bool)>,
 ) -> LayoutAction {
     let mut action = LayoutAction::None;
+    let screen_width = ui
+        .ctx()
+        .input(|i| i.viewport().monitor_size.map(|s| s.x).unwrap_or(1280.0));
 
     egui::Panel::top("main_top_bar")
         .frame(egui::Frame::new().fill(egui::Color32::from_rgb(30, 30, 30)))
@@ -71,6 +74,10 @@ pub fn draw_top_bar(
                         egui::Window::new("Save Layout")
                             .collapsible(false)
                             .resizable(false)
+                            .default_pos(egui::pos2(
+                                screen_width - 240.0,
+                                40.0,
+                            ))
                             .show(ctx, |ui| {
                                 ui.label("Layout name:");
                                 ui.text_edit_singleline(save_name);
@@ -134,6 +141,10 @@ pub fn draw_top_bar(
         egui::Window::new("Delete Layout")
             .collapsible(false)
             .resizable(false)
+            .default_pos(egui::pos2(
+                screen_width - 240.0,
+                100.0,
+            ))
             .show(ctx, |ui| {
                 ui.label(format!("Delete layout '{}'?", name_clone));
                 ui.horizontal(|ui| {
