@@ -175,6 +175,7 @@ impl PackageManager {
             .iter()
             .find(|p| p.vendor == vendor && p.name == name)
             .ok_or_else(|| {
+                magic_core::oracle_error!("PackageManager", "Package '{vendor}/{name}' not found for bump");
                 PackageError::InvalidArgument(format!("Package '{vendor}/{name}' not found"))
             })?;
         Self::update_versions_file(&pkg.root)
@@ -216,6 +217,7 @@ impl PackageManager {
             Err(_) => ureq::get(&url_master)
                 .call()
                 .map_err(|e| {
+                    magic_core::oracle_error!("PackageManager", "Download error for {}/{}: {}", vendor, name, e);
                     PackageError::DownloadError(format!(
                         "Failed to fetch versions.toml for {}/{}: {}",
                         vendor, name, e
@@ -279,6 +281,7 @@ impl PackageManager {
             Err(_) => ureq::get(&url_master)
                 .call()
                 .map_err(|e| {
+                    magic_core::oracle_error!("PackageManager", "Download error for {}/{}: {}", vendor, name, e);
                     PackageError::DownloadError(format!(
                         "Failed to fetch versions.toml for {}/{}: {}",
                         vendor, name, e
@@ -320,9 +323,12 @@ impl PackageManager {
                     }
                 }
             }
-            found.ok_or_else(|| PackageError::InvalidManifest {
-                path: temp_dir.clone(),
-                message: "No package.toml found in zip archive".into(),
+            found.ok_or_else(|| {
+                magic_core::oracle_error!("PackageManager", "No package.toml found in zip archive: {}", zip_path.display());
+                PackageError::InvalidManifest {
+                    path: temp_dir.clone(),
+                    message: "No package.toml found in zip archive".into(),
+                }
             })?
         };
 
@@ -514,6 +520,7 @@ impl PackageManager {
                 for package_root in read_directories(&vendor_entry)? {
                     let package = self.read_manifest(&category, &vendor, package_root)?;
                     if !identifiers.insert(package.dependency_identifier()) {
+                        magic_core::oracle_error!("PackageManager", "Duplicate package identifier: {}", package.id());
                         return Err(PackageError::DuplicateId(package.id()));
                     }
                     packages.push(package);
@@ -639,6 +646,7 @@ impl PackageManager {
                 "Editor manifest not found at {}",
                 self.editor_manifest.display()
             );
+            magic_core::oracle_warn!("PackageManager", "Editor manifest not found at {}", self.editor_manifest.display());
         }
 
         if self.runtime_manifest.exists() {
@@ -651,6 +659,7 @@ impl PackageManager {
                 "Runtime manifest not found at {}",
                 self.runtime_manifest.display()
             );
+            magic_core::oracle_warn!("PackageManager", "Runtime manifest not found at {}", self.runtime_manifest.display());
         }
 
         if update_editor_lib_register(&self.editor_lib_rs, &editor_aliases)? {
@@ -676,6 +685,7 @@ impl PackageManager {
         validate_segment("package name", name)?;
         let targets = targets.into_iter().collect::<BTreeSet<_>>();
         if targets.is_empty() {
+            magic_core::oracle_error!("PackageManager", "init_package: at least one target is required for {}/{}", vendor, name);
             return Err(PackageError::InvalidArgument(
                 "at least one target is required".into(),
             ));
@@ -683,6 +693,7 @@ impl PackageManager {
 
         let root = self.packages_root.join(category).join(vendor).join(name);
         if root.exists() {
+            magic_core::oracle_warn!("PackageManager", "Package {}/{} already exists at {}", vendor, name, root.display());
             return Err(PackageError::AlreadyExists(root));
         }
 
@@ -754,6 +765,7 @@ impl PackageManager {
         }
 
         let root = target_root.ok_or_else(|| {
+            magic_core::oracle_error!("PackageManager", "Package '{vendor}/{name}' does not exist for removal");
             PackageError::InvalidArgument(format!("Package '{vendor}/{name}' does not exist"))
         })?;
 
@@ -810,6 +822,7 @@ impl PackageManager {
         }
 
         let manifest_path = target_manifest_path.ok_or_else(|| {
+            magic_core::oracle_error!("PackageManager", "Package '{vendor}/{name}' does not exist for status change");
             PackageError::InvalidArgument(format!("Package '{vendor}/{name}' does not exist"))
         })?;
 
@@ -908,6 +921,7 @@ impl PackageManager {
     ) -> Result<PackageManifest, PackageError> {
         let path = root.join("package.toml");
         if !path.is_file() {
+            magic_core::oracle_error!("PackageManager", "package.toml is required at {}", path.display());
             return Err(PackageError::InvalidManifest {
                 path,
                 message: "package.toml is required".into(),
@@ -918,11 +932,15 @@ impl PackageManager {
             source,
         })?;
         let raw: RawManifest =
-            toml::from_str(&content).map_err(|source| PackageError::Manifest {
-                path: path.clone(),
-                source,
+            toml::from_str(&content).map_err(|source| {
+                magic_core::oracle_error!("PackageManager", "Failed to parse package.toml at {}: {}", path.display(), source);
+                PackageError::Manifest {
+                    path: path.clone(),
+                    source,
+                }
             })?;
         if raw.name.trim().is_empty() || raw.version.trim().is_empty() {
+            magic_core::oracle_error!("PackageManager", "Package at {}: name and version must not be empty", path.display());
             return Err(PackageError::InvalidManifest {
                 path,
                 message: "name and version must not be empty".to_string(),
@@ -935,6 +953,7 @@ impl PackageManager {
                 crate::utils::get_workspace_engine_version(&workspace_root)
             {
                 if required_magic != &engine_version {
+                    magic_core::oracle_error!("PackageManager", "Package {} requires magic engine version '{}', but workspace engine version is '{}'", path.display(), required_magic, engine_version);
                     return Err(PackageError::InvalidManifest {
                         path: path.clone(),
                         message: format!(
@@ -951,12 +970,14 @@ impl PackageManager {
             Some("enabled") if raw.enabled != Some(false) => true,
             Some("disabled") if raw.enabled != Some(true) => false,
             Some("enabled") | Some("disabled") => {
+                magic_core::oracle_error!("PackageManager", "Package at {}: status and enabled disagree", path.display());
                 return Err(PackageError::InvalidManifest {
                     path,
                     message: "status and enabled disagree".into(),
                 });
             }
             Some(status) => {
+                magic_core::oracle_error!("PackageManager", "Package at {}: unsupported status '{}'", path.display(), status);
                 return Err(PackageError::InvalidManifest {
                     path,
                     message: format!("unsupported status '{status}'"),
@@ -973,6 +994,7 @@ impl PackageManager {
                     targets.insert(PackageTarget::Runtime);
                 }
                 _ => {
+                    magic_core::oracle_error!("PackageManager", "Package at {}: unsupported target '{}'", path.display(), target);
                     return Err(PackageError::InvalidManifest {
                         path,
                         message: format!("unsupported target '{target}'"),
