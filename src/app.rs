@@ -290,17 +290,20 @@ impl eframe::App for MagicBevyApp {
                 }
                 self.window_manager.set_active_layout(&name);
                 self.current_layout_name = Some(name.clone());
+                self.window_manager.layout_dirty = true;
             }
             LayoutAction::Load { name, is_global } => {
                 self.window_manager.load_layout_named(&self.windows, &name, is_global);
                 self.window_manager.set_active_layout(&name);
                 self.current_layout_name = Some(name.clone());
+                self.window_manager.layout_dirty = true;
             }
             LayoutAction::Delete { name, is_global } => {
                 self.window_manager.delete_layout(&name, is_global);
                 if self.current_layout_name.as_ref() == Some(&name.to_string()) {
                     self.current_layout_name = None;
                 }
+                self.window_manager.layout_dirty = true;
             }
             LayoutAction::None => {}
         }

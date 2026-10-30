@@ -3,6 +3,7 @@ use std::sync::mpsc::{Receiver, Sender, channel};
 use crate::layouts::LayoutManager;
 use egui_dock::{DockState, TabViewer};
 use magic_core::*;
+use serde_json;
 
 pub struct WindowManager {
     pub window_instances: WindowInstances,
@@ -10,6 +11,7 @@ pub struct WindowManager {
     pub rx: Receiver<WindowId>,
     pub layout_manager: LayoutManager,
     pub dock_state: DockState<WindowTab>,
+    pub layout_dirty: bool,
 }
 
 impl WindowManager {
@@ -21,6 +23,7 @@ impl WindowManager {
             rx,
             layout_manager: LayoutManager::new(),
             dock_state: DockState::new(Vec::new()),
+            layout_dirty: true,
         }
     }
 
@@ -37,6 +40,7 @@ impl WindowManager {
                 instance_id,
             };
             self.dock_state.push_to_focused_leaf(tab);
+            self.layout_dirty = true;
             mgsuccess!("Window", "Opened '{}' (id: {})", title, instance_id);
         } else {
             mgwarn!("Window", "No factory registered for window '{}'", window_id);
@@ -46,6 +50,7 @@ impl WindowManager {
     #[allow(dead_code)]
     pub fn close_window(&mut self, tab: &WindowTab) {
         self.window_instances.remove(tab.instance_id);
+        self.layout_dirty = true;
     }
 
     pub fn save_layout_named(&mut self, name: &str, is_global: bool) {
@@ -56,12 +61,14 @@ impl WindowManager {
     pub fn load_layout_named(&mut self, windows: &WindowRegistry, name: &str, is_global: bool) {
         self.layout_manager.load_layout(&mut self.dock_state, name, is_global);
         self.rebuild_instances_for_layout(windows);
+        self.layout_dirty = true;
     }
 
     pub fn load_temp_layout(&mut self, windows: &WindowRegistry) -> bool {
         let loaded = self.layout_manager.load_temp_layout(&mut self.dock_state);
         if loaded {
             self.rebuild_instances_for_layout(windows);
+            self.layout_dirty = true;
         }
         loaded
     }
@@ -108,8 +115,16 @@ impl WindowManager {
         let mut tab_viewer = WindowTabViewer {
             instances: &mut self.window_instances,
         };
+
+        let old_json = serde_json::to_string(&self.dock_state).unwrap_or_default();
+
         egui_dock::DockArea::new(&mut self.dock_state)
             .show_inside(ui, &mut tab_viewer);
+
+        let new_json = serde_json::to_string(&self.dock_state).unwrap_or_default();
+        if old_json != new_json {
+            self.layout_dirty = true;
+        }
 
         // Sync instances with dock state: remove instances whose tabs no longer exist
         let open_instance_ids: Vec<u64> = self
@@ -129,7 +144,10 @@ impl WindowManager {
         }
 
         // Auto-save current dock state as draft so manual layout changes persist
-        self.layout_manager.save_temp_layout(&self.dock_state);
+        if self.layout_dirty {
+            self.layout_manager.save_temp_layout(&self.dock_state);
+            self.layout_dirty = false;
+        }
     }
 }
 
