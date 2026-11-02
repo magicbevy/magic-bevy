@@ -16,6 +16,10 @@ fn global_layouts_dir() -> std::path::PathBuf {
     magic_bevy_dir().join("layouts")
 }
 
+fn magic_dir() -> std::path::PathBuf {
+    std::path::PathBuf::from("./.magic")
+}
+
 pub const TEMP_LAYOUT_NAME: &str = ".temp.layout";
 
 pub struct LayoutManager {
@@ -46,9 +50,9 @@ impl LayoutManager {
     }
 
     fn save_active_layout_state(&self, name: &str) {
-        let layouts_dir = project_layouts_dir();
-        let _ = std::fs::create_dir_all(&layouts_dir);
-        let path = layouts_dir.join("active_layout.json");
+        let magic = magic_dir();
+        let _ = std::fs::create_dir_all(&magic);
+        let path = magic.join("active_layout.json");
         let content = serde_json::to_string(&serde_json::json!({ "active_layout": name }))
             .unwrap_or_else(|e| {
                 magic_core::oracle_error!("Layout", "Failed to serialize active layout: {}", e);
@@ -59,7 +63,7 @@ impl LayoutManager {
 
     #[allow(dead_code)]
     fn load_active_layout_state(&mut self) {
-        let path = project_layouts_dir().join("active_layout.json");
+        let path = magic_dir().join("active_layout.json");
         if path.exists() {
             if let Ok(content) = std::fs::read_to_string(&path) {
                 if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
@@ -72,9 +76,9 @@ impl LayoutManager {
     }
 
     pub fn save_temp_layout(&self, dock_state: &DockState<WindowTab>) {
-        let layouts_dir = project_layouts_dir();
-        let _ = std::fs::create_dir_all(&layouts_dir);
-        let layout_path = layouts_dir.join(".temp.layout");
+        let magic = magic_dir();
+        let _ = std::fs::create_dir_all(&magic);
+        let layout_path = magic.join(".temp.layout");
         let json = serde_json::to_string_pretty(dock_state)
             .unwrap_or_else(|e| {
                 magic_core::oracle_error!("Layout", "Failed to serialize temp layout: {}", e);
@@ -84,7 +88,7 @@ impl LayoutManager {
     }
 
     pub fn load_temp_layout(&self, dock_state: &mut DockState<WindowTab>) -> bool {
-        let layout_path = project_layouts_dir().join(".temp.layout");
+        let layout_path = magic_dir().join(".temp.layout");
         if !layout_path.exists() {
             return false;
         }
@@ -103,7 +107,7 @@ impl LayoutManager {
 
     #[allow(dead_code)]
     pub fn clear_temp_layout(&self) {
-        let layout_path = project_layouts_dir().join(".temp.layout");
+        let layout_path = magic_dir().join(".temp.layout");
         let _ = std::fs::remove_file(&layout_path);
     }
 
@@ -189,12 +193,11 @@ impl LayoutManager {
     }
 
     pub fn delete_layout(&self, name: &str, is_global: bool) {
-        if !is_global {
-            mgwarn!("Layout", "Cannot delete project layout '{}'", name);
-            return;
-        }
-
-        let layout_path = global_layouts_dir().join(format!("{}.layout", name));
+        let layout_path = if is_global {
+            global_layouts_dir().join(format!("{}.layout", name))
+        } else {
+            project_layouts_dir().join(format!("{}.layout", name))
+        };
 
         if layout_path.exists() {
             if let Err(e) = std::fs::remove_file(&layout_path) {

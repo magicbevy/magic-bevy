@@ -24,11 +24,11 @@ impl SystemManager {
 
     pub fn reload_systems(&mut self) {
         mgprint!("SystemManager", "Preparing for hot-reload...");
-        
+
         for sys in &mut self.active_systems {
             sys.on_disable();
         }
-        
+
         self.active_systems.clear();
         mgprint!("SystemManager", "Old systems successfully cleared and memory freed.");
     }

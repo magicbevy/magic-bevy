@@ -33,11 +33,11 @@ impl PackageManager {
             match libloading::Library::new(lib_path) {
                 Ok(lib) => {
                     type CreateFn = fn() -> Box<dyn EditorSystem>;
-                    
+
                     if let Ok(constructor) = lib.get::<CreateFn>(b"create_system\0") {
                         let editor_workspace = constructor();
                         self.active_systems.add_system(editor_workspace);
-                        
+
                         self.current_lib = Some(lib);
                         Ok(())
                     } else {

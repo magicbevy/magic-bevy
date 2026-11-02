@@ -31,6 +31,7 @@ fn main() -> Result<(), eframe::Error> {
 
     std::fs::create_dir_all("./packages").unwrap();
     std::fs::create_dir_all("./layouts").unwrap();
+    std::fs::create_dir_all("./.magic").unwrap();
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()

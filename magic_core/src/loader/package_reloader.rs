@@ -26,7 +26,7 @@ impl PackageReloader {
                 if manifest_path.exists() {
                     count += 1;
                     let package_id = path.file_name().unwrap().to_string_lossy().into_owned();
-                    
+
                     status_manager.set_compiling(&package_id, count);
 
                     if path.join("editor").exists() {

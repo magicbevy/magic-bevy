@@ -18,6 +18,7 @@ magic_pkg = { path = "magic_pkg" }
 libloading = "0.8"
 eframe = "0.36"
 egui = "0.36"
+egui-phosphor = "0.14"
 egui_dock = { version = "0.21", features = ["serde"] }
 notify = "8.1.0"
 serde_json = "1"

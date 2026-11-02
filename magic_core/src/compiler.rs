@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompilerLockMode {
-    Free,       
+    Free,
     EditorLock,
 }
 

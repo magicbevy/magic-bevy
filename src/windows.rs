@@ -1,6 +1,8 @@
-use std::sync::mpsc::{Receiver, Sender, channel};
+use std::sync::mpsc::{channel, Receiver, Sender};
 
+use crate::app::EngineTheme;
 use crate::layouts::LayoutManager;
+use eframe::egui;
 use egui_dock::{DockState, TabViewer};
 use magic_core::*;
 use serde_json;
@@ -43,7 +45,11 @@ impl WindowManager {
             self.layout_dirty = true;
             mgsuccess!("Window", "Opened '{}' (id: {})", title, instance_id);
         } else {
-            mgwarn!("Window", "No factory registered for window '{}'", window_id);
+            mgwarn!(
+                "Window",
+                "No factory registered for window '{}'",
+                window_id
+            );
         }
     }
 
@@ -54,12 +60,14 @@ impl WindowManager {
     }
 
     pub fn save_layout_named(&mut self, name: &str, is_global: bool) {
-        self.layout_manager.save_layout(&mut self.dock_state, name, is_global);
+        self.layout_manager
+            .save_layout(&self.dock_state, name, is_global);
         self.layout_manager.clear_temp_layout();
     }
 
     pub fn load_layout_named(&mut self, windows: &WindowRegistry, name: &str, is_global: bool) {
-        self.layout_manager.load_layout(&mut self.dock_state, name, is_global);
+        self.layout_manager
+            .load_layout(&mut self.dock_state, name, is_global);
         self.rebuild_instances_for_layout(windows);
         self.layout_dirty = true;
     }
@@ -74,10 +82,7 @@ impl WindowManager {
     }
 
     fn rebuild_instances_for_layout(&mut self, windows: &WindowRegistry) {
-        let (dock_state, window_instances) = (
-            &mut self.dock_state,
-            &mut self.window_instances,
-        );
+        let (dock_state, window_instances) = (&mut self.dock_state, &mut self.window_instances);
 
         *window_instances = WindowInstances::new();
 
@@ -111,6 +116,49 @@ impl WindowManager {
         self.layout_manager.get_active_layout()
     }
 
+
+    fn custom_dock_style(egui_style: &egui::Style) -> egui_dock::Style {
+        let mut style = egui_dock::Style::from_egui(egui_style);
+
+
+        style.tab_bar.bg_fill = EngineTheme::BG_DEEP;
+        style.tab_bar.height = 30.0;
+        style.tab_bar.hline_color = EngineTheme::BORDER;
+
+
+        style.separator.width = 3.0;
+        style.separator.color_idle = EngineTheme::BG_DEEP;
+        style.separator.color_hovered = EngineTheme::ACCENT;
+        style.separator.color_dragged = EngineTheme::ACCENT_CYAN;
+
+
+        style.tab.tab_body.bg_fill = EngineTheme::BG_DARK;
+        style.tab.tab_body.stroke = egui::Stroke::new(1.0, EngineTheme::BORDER);
+        style.tab.tab_body.inner_margin = egui::Margin::same(4);
+
+
+        style.tab.active.bg_fill = EngineTheme::BG_DARK;
+        style.tab.active.text_color = EngineTheme::TEXT_MAIN;
+        style.tab.active.outline_color = EngineTheme::BORDER_ACTIVE;
+
+
+        style.tab.focused.bg_fill = EngineTheme::ITEM_SELECTED;
+        style.tab.focused.text_color = egui::Color32::WHITE;
+        style.tab.focused.outline_color = EngineTheme::ACCENT_CYAN;
+
+
+        style.tab.inactive.bg_fill = EngineTheme::BG_DEEP;
+        style.tab.inactive.text_color = EngineTheme::TEXT_MUTED;
+        style.tab.inactive.outline_color = egui::Color32::TRANSPARENT;
+
+
+        style.tab.hovered.bg_fill = EngineTheme::ITEM_HOVER;
+        style.tab.hovered.text_color = egui::Color32::WHITE;
+        style.tab.hovered.outline_color = EngineTheme::BORDER_ACTIVE;
+
+        style
+    }
+
     pub fn render_windows(&mut self, ui: &mut egui::Ui, _windows: &mut WindowRegistry) {
         let mut tab_viewer = WindowTabViewer {
             instances: &mut self.window_instances,
@@ -118,7 +166,10 @@ impl WindowManager {
 
         let old_json = serde_json::to_string(&self.dock_state).unwrap_or_default();
 
+        let dock_style = Self::custom_dock_style(ui.style().as_ref());
+
         egui_dock::DockArea::new(&mut self.dock_state)
+            .style(dock_style)
             .show_inside(ui, &mut tab_viewer);
 
         let new_json = serde_json::to_string(&self.dock_state).unwrap_or_default();
@@ -126,7 +177,7 @@ impl WindowManager {
             self.layout_dirty = true;
         }
 
-        // Sync instances with dock state: remove instances whose tabs no longer exist
+
         let open_instance_ids: Vec<u64> = self
             .dock_state
             .iter_all_tabs()
@@ -143,7 +194,7 @@ impl WindowManager {
             self.window_instances.remove(id);
         }
 
-        // Auto-save current dock state as draft so manual layout changes persist
+
         if self.layout_dirty {
             self.layout_manager.save_temp_layout(&self.dock_state);
             self.layout_dirty = false;
@@ -159,7 +210,7 @@ impl<'a> TabViewer for WindowTabViewer<'a> {
     type Tab = WindowTab;
 
     fn ui(&mut self, ui: &mut egui::Ui, tab: &mut WindowTab) {
-        // Ensure minimum height so docked panels don't collapse to zero
+
         ui.set_min_height(120.0);
         ui.set_min_width(200.0);
 
@@ -169,11 +220,19 @@ impl<'a> TabViewer for WindowTabViewer<'a> {
     }
 
     fn title(&mut self, tab: &mut WindowTab) -> egui::WidgetText {
-        if let Some(title) = self.instances.get_title(tab.instance_id) {
-            egui::WidgetText::from(title.to_string())
+        let raw_title = if let Some(title) = self.instances.get_title(tab.instance_id) {
+            title.to_string()
         } else {
-            egui::WidgetText::from(tab.window_id.as_str())
-        }
+            tab.window_id.clone()
+        };
+
+        let decorated = match tab.window_id.as_str() {
+            "grimoire" => raw_title.to_string(),
+            "oracle_logs" => raw_title.to_string(),
+            _ => raw_title.to_string(),
+        };
+
+        egui::RichText::new(decorated).strong().size(12.5).into()
     }
 
     fn closeable(&mut self, _tab: &mut WindowTab) -> bool {

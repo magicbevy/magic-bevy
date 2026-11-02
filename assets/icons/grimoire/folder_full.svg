@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <radialGradient id="fFullShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.65" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="arcaneBackFull" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4C1D95" />
+      <stop offset="100%" stop-color="#1E1B4B" />
+    </linearGradient>
+    <linearGradient id="arcaneFrontFull" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5B21B6" />
+      <stop offset="50%" stop-color="#3B0764" />
+      <stop offset="100%" stop-color="#1E1B4B" />
+    </linearGradient>
+    <linearGradient id="goldRimFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <linearGradient id="spellPage1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FEF3C7" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="spellPage2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <radialGradient id="activeGem" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="64" cy="113" rx="54" ry="7.5" fill="url(#fFullShadow)" />
+
+  <path d="M 12 28 Q 12 18 22 18 L 48 18 Q 53 18 56 22 L 62 30 L 106 30 Q 116 30 116 40 L 116 98 Q 116 108 106 108 L 22 108 Q 12 108 12 98 Z" fill="url(#arcaneBackFull)" stroke="url(#goldRimFull)" stroke-width="2" />
+
+  <rect x="16" y="33" width="96" height="36" rx="5" fill="#090A10" />
+
+  <g transform="rotate(-7 46 50)">
+    <rect x="22" y="22" width="46" height="44" rx="4" fill="url(#spellPage1)" stroke="#B45309" stroke-width="1.5" />
+    <path d="M 30 32 L 58 32 M 30 40 L 50 40" stroke="#92400E" stroke-width="2.5" stroke-linecap="round" />
+    <polygon points="44,46 48,50 44,54 40,50" fill="#B45309" />
+  </g>
+
+  <g transform="rotate(6 78 50)">
+    <rect x="54" y="21" width="48" height="44" rx="4" fill="url(#spellPage2)" stroke="#BAE6FD" stroke-width="1.5" />
+    <circle cx="78" cy="39" r="9" fill="none" stroke="#E0F2FE" stroke-width="1.8" />
+    <polygon points="78,32 82,42 74,42" fill="#FEF08A" />
+  </g>
+
+  <path d="M 8 55 Q 8 50 13 50 L 45 50 Q 49 50 52 47 L 55 44 Q 58 41 62 41 L 115 41 Q 120 41 119.5 46 L 116 98 Q 115.5 108 106 108 L 22 108 Q 12.5 108 12 98 Z" fill="url(#arcaneFrontFull)" stroke="url(#goldRimFull)" stroke-width="2.2" />
+
+  <path d="M 18 92 L 18 102 L 28 102" fill="none" stroke="url(#goldRimFull)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 110 92 L 110 102 L 100 102" fill="none" stroke="url(#goldRimFull)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <polygon points="64,62 78,76 64,90 50,76" fill="url(#goldRimFull)" stroke="#451A03" stroke-width="1.5" stroke-linejoin="round" />
+  <polygon points="64,66 74,76 64,86 54,76" fill="url(#activeGem)" />
+
+  <path d="M 38 14 L 40 18 L 44 20 L 40 22 L 38 26 L 36 22 L 32 20 L 36 18 Z" fill="#FEF08A" />
+  <path d="M 92 12 L 93.5 15 L 96.5 16.5 L 93.5 18 L 92 21 L 90.5 18 L 87.5 16.5 L 90.5 15 Z" fill="#38BDF8" />
+</svg>

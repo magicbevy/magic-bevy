@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E1065" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="bardBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F472B6" />
+      <stop offset="100%" stop-color="#7E22CE" />
+    </linearGradient>
+    <linearGradient id="lyreGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <linearGradient id="magicNote" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67E8F9" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+    <radialGradient id="songAura" cx="50%" cy="55%" r="42%">
+      <stop offset="0%" stop-color="#EC4899" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <path d="M 24 12 L 80 12 L 108 40 L 108 112 Q 108 120 100 120 L 24 120 Q 16 120 16 112 L 16 20 Q 16 12 24 12 Z" fill="#000000" opacity="0.45" />
+  <path d="M 22 8 L 78 8 L 106 36 L 106 108 Q 106 116 98 116 L 22 116 Q 14 116 14 108 L 14 16 Q 14 8 22 8 Z" fill="url(#bardBg)" stroke="url(#bardBorder)" stroke-width="2.5" />
+  <path d="M 78 8 L 78 28 Q 78 36 86 36 L 106 36 Z" fill="#3B0764" stroke="url(#bardBorder)" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="60" cy="64" r="40" fill="url(#songAura)" />
+
+  <path d="M 24 72 Q 42 52 60 72 T 96 72" fill="none" stroke="#F472B6" stroke-width="2" opacity="0.45" />
+  <path d="M 24 62 Q 42 82 60 62 T 96 62" fill="none" stroke="#38BDF8" stroke-width="2" opacity="0.45" />
+
+  <line x1="53" y1="46" x2="53" y2="88" stroke="#67E8F9" stroke-width="2" opacity="0.9" />
+  <line x1="60" y1="44" x2="60" y2="88" stroke="#67E8F9" stroke-width="2" opacity="0.9" />
+  <line x1="67" y1="46" x2="67" y2="88" stroke="#67E8F9" stroke-width="2" opacity="0.9" />
+
+  <path d="M 38 42 Q 28 42 32 58 Q 37 78 46 88 L 74 88 Q 83 78 88 58 Q 92 42 82 42 Q 76 42 75 48 L 45 48 Q 44 42 38 42 Z" fill="none" stroke="url(#lyreGold)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="42" y="86" width="36" height="8" rx="4" fill="url(#lyreGold)" />
+  <polygon points="60,84 65,90 60,96 55,90" fill="#EC4899" stroke="#FEF08A" stroke-width="1" />
+
+  <g transform="translate(8, -4)">
+    <path d="M 52 54 L 52 28 L 72 23 L 72 49" fill="none" stroke="url(#magicNote)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    <ellipse cx="48" cy="55" rx="6" ry="4.5" transform="rotate(-18 48 55)" fill="url(#magicNote)" />
+    <ellipse cx="68" cy="50" rx="6" ry="4.5" transform="rotate(-18 68 50)" fill="url(#magicNote)" />
+  </g>
+
+  <path d="M 32 28 L 34 33 L 39 35 L 34 37 L 32 42 L 30 37 L 25 35 L 30 33 Z" fill="#FEF08A" />
+  <path d="M 88 74 L 89.5 78 L 93.5 79.5 L 89.5 81 L 88 85 L 86.5 81 L 82.5 79.5 L 86.5 78 Z" fill="#67E8F9" />
+</svg>

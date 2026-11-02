@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rScrollBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="rScrollBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#4C1D95" />
+    </linearGradient>
+    <linearGradient id="crabGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C" />
+      <stop offset="50%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#9A3412" />
+    </linearGradient>
+    <linearGradient id="wizHat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#2E1065" />
+    </linearGradient>
+    <radialGradient id="crabGlow" cx="50%" cy="58%" r="44%">
+      <stop offset="0%" stop-color="#F97316" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#8B5CF6" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <path d="M 24 12 L 80 12 L 108 40 L 108 112 Q 108 120 100 120 L 24 120 Q 16 120 16 112 L 16 20 Q 16 12 24 12 Z" fill="#000000" opacity="0.45" />
+  <path d="M 22 8 L 78 8 L 106 36 L 106 108 Q 106 116 98 116 L 22 116 Q 14 116 14 108 L 14 16 Q 14 8 22 8 Z" fill="url(#rScrollBg)" stroke="url(#rScrollBorder)" stroke-width="2.5" />
+  <path d="M 78 8 L 78 28 Q 78 36 86 36 L 106 36 Z" fill="#312E81" stroke="url(#rScrollBorder)" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="60" cy="68" r="42" fill="url(#crabGlow)" />
+
+  <ellipse cx="60" cy="96" rx="34" ry="8" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.7" />
+  <ellipse cx="60" cy="96" rx="24" ry="4.5" fill="none" stroke="#A78BFA" stroke-width="1.2" opacity="0.6" />
+
+  <g transform="translate(0, 6) scale(1.06)" transform-origin="60 68">
+    <g stroke="#9A3412" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 38 72 L 25 78 L 22 86" />
+      <path d="M 41 76 L 29 84 L 28 92" />
+      <path d="M 82 72 L 95 78 L 98 86" />
+      <path d="M 79 76 L 91 84 L 92 92" />
+    </g>
+
+    <path d="M 38 62 C 25 55, 21 43, 27 37 C 31 33, 38 37, 37 44 C 35 42, 31 43, 32 47 C 33 51, 39 54, 43 58 Z" fill="url(#crabGrad)" stroke="#7C2D12" stroke-width="1.2" />
+    <path d="M 82 62 C 95 55, 99 43, 93 37 C 89 33, 82 37, 83 44 C 85 42, 89 43, 88 47 C 87 51, 81 54, 77 58 Z" fill="url(#crabGrad)" stroke="#7C2D12" stroke-width="1.2" />
+
+    <path d="M 32 67 C 32 47, 88 47, 88 67 C 88 79, 76 83, 60 83 C 44 83, 32 79, 32 67 Z" fill="url(#crabGrad)" stroke="#7C2D12" stroke-width="1.5" />
+
+    <ellipse cx="50.5" cy="64" rx="4.5" ry="5.2" fill="#FFFFFF" />
+    <ellipse cx="69.5" cy="64" rx="4.5" ry="5.2" fill="#FFFFFF" />
+    <circle cx="50.5" cy="64.5" r="2.6" fill="#0F172A" />
+    <circle cx="69.5" cy="64.5" r="2.6" fill="#0F172A" />
+    <circle cx="49.2" cy="63" r="1.2" fill="#FFFFFF" />
+    <circle cx="68.2" cy="63" r="1.2" fill="#FFFFFF" />
+
+    <path d="M 55 73 Q 60 77 65 73" fill="none" stroke="#431407" stroke-width="2.2" stroke-linecap="round" />
+
+    <path d="M 35 53 Q 60 60 85 53 L 74 47 L 64 18 L 49 27 L 53 32 L 45 47 Z" fill="url(#wizHat)" stroke="#FDE047" stroke-width="1.8" stroke-linejoin="round" />
+    <path d="M 44 48.5 Q 60 54 76 48.5" fill="none" stroke="#F59E0B" stroke-width="3.8" stroke-linecap="round" />
+    <polygon points="60,34 62.2,38.5 67,39.5 62.2,41.5 60,46 57.8,41.5 53,39.5 57.8,38.5" fill="#FEF08A" />
+  </g>
+
+  <path d="M 28 24 L 30 28 L 34 30 L 30 32 L 28 36 L 26 32 L 22 30 L 26 28 Z" fill="#FEF08A" />
+  <circle cx="92" cy="50" r="2" fill="#38BDF8" />
+</svg>

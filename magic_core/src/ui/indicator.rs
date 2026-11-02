@@ -1,11 +1,11 @@
-// editor/src/ui/indicator.rs
+
 use eframe::egui;
 use crate::status::CompileStatus;
 
 pub fn draw_status_indicator(ctx: &egui::Context, ui: &mut egui::Ui, status: &CompileStatus) {
     ui.horizontal(|ui| {
         ui.add_space(5.0);
-        
+
         match status {
             CompileStatus::Idle => {
                 draw_led(ui, egui::Color32::from_gray(100));
@@ -15,10 +15,10 @@ pub fn draw_status_indicator(ctx: &egui::Context, ui: &mut egui::Ui, status: &Co
                 let time = ui.input(|i| i.time);
                 let alpha = (((time * 5.0).sin() + 1.0) / 2.0 * 255.0) as u8;
                 let blue_blink = egui::Color32::from_rgba_unmultiplied(0, 150, 255, alpha);
-                
+
                 draw_led(ui, blue_blink);
                 ctx.request_repaint();
-                
+
                 ui.small(format!("[{}] Indexing: {}", progress, current_file));
             }
             CompileStatus::Success => {

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <radialGradient id="pkgShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.65" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="pkgAura" cx="50%" cy="48%" r="50%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="boxTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6D28D9" />
+      <stop offset="100%" stop-color="#4C1D95" />
+    </linearGradient>
+    <linearGradient id="boxLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4C1D95" />
+      <stop offset="100%" stop-color="#2E1065" />
+    </linearGradient>
+    <linearGradient id="boxRight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B0764" />
+      <stop offset="100%" stop-color="#1E1B4B" />
+    </linearGradient>
+    <linearGradient id="goldRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <radialGradient id="manaGem" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="64" cy="114" rx="48" ry="7.5" fill="url(#pkgShadow)" />
+  <circle cx="64" cy="62" r="54" fill="url(#pkgAura)" />
+
+  <polygon points="64,16 112,40 64,64 16,40" fill="url(#boxTop)" stroke="url(#goldRim)" stroke-width="2.5" stroke-linejoin="round" />
+  <polygon points="16,40 64,64 64,112 16,88" fill="url(#boxLeft)" stroke="url(#goldRim)" stroke-width="2.5" stroke-linejoin="round" />
+  <polygon points="64,64 112,40 112,88 64,112" fill="url(#boxRight)" stroke="url(#goldRim)" stroke-width="2.5" stroke-linejoin="round" />
+
+  <line x1="40" y1="28" x2="88" y2="52" stroke="#2E1065" stroke-width="2" />
+
+  <polygon points="82,25 94,31 46,55 34,49" fill="url(#goldRim)" stroke="#78350F" stroke-width="1" stroke-linejoin="round" />
+  <polygon points="34,49 46,55 46,77 34,71" fill="url(#goldRim)" stroke="#78350F" stroke-width="1" stroke-linejoin="round" />
+
+  <polyline points="16,40 64,64 112,40" fill="none" stroke="#FEF08A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />
+
+  <polygon points="88,66 98,74 88,92 78,84" fill="url(#goldRim)" stroke="#451A03" stroke-width="1.2" stroke-linejoin="round" />
+  <polygon points="88,70 94,75 88,88 82,83" fill="url(#manaGem)" />
+</svg>

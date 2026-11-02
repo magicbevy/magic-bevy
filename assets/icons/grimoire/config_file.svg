@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <radialGradient id="gearGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#8B5CF6" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="goldBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="45%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <linearGradient id="arcanePlate" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5B21B6" />
+      <stop offset="50%" stop-color="#3B0764" />
+      <stop offset="100%" stop-color="#1E1B4B" />
+    </linearGradient>
+    <radialGradient id="manaCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </radialGradient>
+  </defs>
+
+  <circle cx="64" cy="64" r="58" fill="url(#gearGlow)" />
+
+  <g transform="translate(64, 64)">
+    <path d="M -9,-39 L -8,-52 L 8,-52 L 9,-39
+             A 40,40 0 0,1 21.2,-33.9
+             L 30.6,-42.1 L 42.1,-30.6 L 33.9,-21.2
+             A 40,40 0 0,1 39,-9
+             L 52,-8 L 52,8 L 39,9
+             A 40,40 0 0,1 33.9,21.2
+             L 42.1,30.6 L 30.6,42.1 L 21.2,33.9
+             A 40,40 0 0,1 9,39
+             L 8,52 L -8,52 L -9,39
+             A 40,40 0 0,1 -21.2,33.9
+             L -30.6,42.1 L -42.1,30.6 L -33.9,21.2
+             A 40,40 0 0,1 -39,9
+             L -52,8 L -52,-8 L -39,-9
+             A 40,40 0 0,1 -33.9,-21.2
+             L -42.1,-30.6 L -30.6,-42.1 L -21.2,-33.9
+             A 40,40 0 0,1 -9,-39 Z"
+          fill="url(#goldBody)"
+          stroke="#78350F"
+          stroke-width="2.5"
+          stroke-linejoin="round" />
+
+    <circle cx="0" cy="0" r="31" fill="url(#arcanePlate)" stroke="#FEF08A" stroke-width="1.8" />
+
+    <polygon points="0,-24 6,-6 24,0 6,6 0,24 -6,6 -24,0 -6,-6" fill="url(#goldBody)" opacity="0.85" />
+
+    <circle cx="0" cy="0" r="14" fill="#1E1B4B" stroke="url(#goldBody)" stroke-width="3" />
+    <polygon points="0,-10 10,0 0,10 -10,0" fill="url(#manaCore)" />
+  </g>
+</svg>

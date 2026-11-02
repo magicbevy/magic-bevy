@@ -1,8 +1,9 @@
 # Dev Status - MagicBevy
 
-## Current Phase: Oracle Logs Console
+## Current Phase: Grimoire (Package Manager + File Manager merged)
 
 ### ✅ Completed
+- Grimoire: Package Manager + File Manager merged into a single dockable window (file manager with assets/editor/runtime security, inline rename, drag&drop, inspector integration, package details, sync/update)
 - Centralized logging system: `LogEntry`, `LogLevel`, `LogStore`, `global_store` (OnceLock + Mutex singleton)
 - Log macros: `oracle_info!`, `oracle_warn!`, `oracle_error!`, `oracle_success!`, `oracle_debug!`
 - `OracleLogsWindow` dockable panel: per-log row with level icon (E/W/I/S/D), timestamp, level tag, short title
@@ -24,8 +25,7 @@
 - None
 
 ### ⏳ Next Planned
-- Package Manager Window
-- File Manager Window
+- None
 
 ### 🚫 Blocked
 - None
@@ -48,6 +48,10 @@
 | `src/hot_reload.rs` | Watcher creation failure → `oracle_error!`; cargo stderr in CompileError |
 | `src/layouts.rs` | serde_json unwraps → `unwrap_or_else` + `oracle_error!` |
 | `magic_core/Cargo.toml` | Added `chrono` dependency |
+| `magic_core/src/api/assets.rs` | New: AssetTypeRegistry, global singleton, folder/subfolder filtering |
+| `magic_core/src/ui/inspector.rs` | New: InspectorWindow |
+| `magic_core/src/ui/grimoire/window.rs` | Rewritten: unified file manager + package manager |
+| `src/app.rs` | Integrated grimoire callbacks, inspector, built-in asset types, persistence |
 
 ---
 

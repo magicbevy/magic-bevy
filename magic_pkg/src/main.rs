@@ -18,60 +18,60 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Initialize a new package
+
     Init {
-        /// Category name (e.g. editor, runtime, games)
+
         #[arg(long, default_value = "editor")]
         category: String,
-        /// Package identifier in vendor/name format (e.g. magicbevy/lighting_tools)
+
         package: String,
-        /// Include editor target
+
         #[arg(long)]
         editor: bool,
-        /// Include runtime target
+
         #[arg(long)]
         runtime: bool,
     },
-    /// Install a package from a repository reference (vendor/name or vendor/name#version) or a local zip file
+
     Install {
-        /// Repository reference or path to a local zip file
+
         source: String,
     },
-    /// Remove an existing package
+
     Remove {
-        /// Package identifier in vendor/name format
+
         package: String,
     },
-    /// Enable a package
+
     Enable {
-        /// Package identifier in vendor/name format
+
         package: String,
     },
-    /// Disable a package
+
     Disable {
-        /// Package identifier in vendor/name format
+
         package: String,
     },
-    /// Check for available updates for installed packages
+
     Outdated,
-    /// Update/upgrade one or all packages to the latest compatible version
+
     Update {
-        /// Package identifier in vendor/name format (if omitted, updates all packages)
+
         package: Option<String>,
     },
-    /// List all released versions and channels for a specific package
+
     Versions {
-        /// Package identifier in vendor/name format (e.g. magicbevy/lighting_tools)
+
         package: String,
     },
-    /// Update versions.toml of a local package with current version, magic version, and Unix timestamp
+
     Bump {
-        /// Package identifier in vendor/name format (e.g. alirezapkg/test). If omitted, bumps all packages.
+
         package: Option<String>,
     },
-    /// Sync package dependencies with Cargo manifests
+
     Sync,
-    /// List all discovered packages
+
     List,
 }
 

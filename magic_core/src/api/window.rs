@@ -6,6 +6,8 @@ pub trait EditorWindow: Send + Sync {
     fn id(&self) -> WindowId;
     fn title(&self) -> &str;
     fn draw(&mut self, ui: &mut egui::Ui);
+    fn save_state(&self) -> Option<String> { None }
+    fn restore_state(&mut self, _state: &str) {}
 }
 
 pub struct WindowDescriptor {

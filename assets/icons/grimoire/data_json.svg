@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="scrollBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="100%" stop-color="#090D16" />
+    </linearGradient>
+    <linearGradient id="scrollBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#4C1D95" />
+    </linearGradient>
+    <linearGradient id="sigilBrace" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="crystalFacet1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67E8F9" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <linearGradient id="crystalFacet2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#4C1D95" />
+    </linearGradient>
+    <radialGradient id="crystalAura" cx="50%" cy="55%" r="42%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <path d="M 24 12 L 80 12 L 108 40 L 108 112 Q 108 120 100 120 L 24 120 Q 16 120 16 112 L 16 20 Q 16 12 24 12 Z" fill="#000000" opacity="0.45" />
+  <path d="M 22 8 L 78 8 L 106 36 L 106 108 Q 106 116 98 116 L 22 116 Q 14 116 14 108 L 14 16 Q 14 8 22 8 Z" fill="url(#scrollBg)" stroke="url(#scrollBorder)" stroke-width="2.5" />
+  <path d="M 78 8 L 78 28 Q 78 36 86 36 L 106 36 Z" fill="#1E293B" stroke="url(#scrollBorder)" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="60" cy="64" r="40" fill="url(#crystalAura)" />
+
+  <path d="M 44 36 Q 33 36 33 46 L 33 56 Q 33 64 23 64 Q 33 64 33 72 L 33 82 Q 33 92 44 92" fill="none" stroke="url(#sigilBrace)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <polygon points="44,32 49,36 44,40 39,36" fill="#FEF08A" />
+  <polygon points="44,88 49,92 44,96 39,92" fill="#FEF08A" />
+
+  <path d="M 76 36 Q 87 36 87 46 L 87 56 Q 87 64 97 64 Q 87 64 87 72 L 87 82 Q 87 92 76 92" fill="none" stroke="url(#sigilBrace)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <polygon points="76,32 81,36 76,40 71,36" fill="#FEF08A" />
+  <polygon points="76,88 81,92 76,96 71,92" fill="#FEF08A" />
+
+  <polygon points="60,38 73,58 60,90 47,58" fill="url(#crystalFacet1)" stroke="#E0F2FE" stroke-width="1" stroke-linejoin="round" />
+  <polygon points="60,38 73,58 60,64" fill="url(#crystalFacet2)" opacity="0.75" />
+  <polygon points="60,90 73,58 60,64" fill="#0369A1" opacity="0.8" />
+  <polygon points="60,38 47,58 60,64" fill="#BAE6FD" opacity="0.6" />
+
+  <circle cx="60" cy="27" r="3" fill="#FEF08A" />
+  <circle cx="45" cy="64" r="2.2" fill="#38BDF8" />
+  <circle cx="75" cy="64" r="2.2" fill="#38BDF8" />
+
+  <path d="M 42 104 L 78 104" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+  <polygon points="60,100 64,104 60,108 56,104" fill="#38BDF8" />
+</svg>

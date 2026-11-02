@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="unkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="55%" stop-color="#131629" />
+      <stop offset="100%" stop-color="#090D16" />
+    </linearGradient>
+    <linearGradient id="unkBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA" />
+      <stop offset="50%" stop-color="#6D28D9" />
+      <stop offset="100%" stop-color="#312E81" />
+    </linearGradient>
+    <linearGradient id="mysteryGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+    <radialGradient id="mysteryGlow" cx="50%" cy="55%" r="42%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#38BDF8" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="orbDot" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </radialGradient>
+  </defs>
+
+  <path d="M 24 12 L 80 12 L 108 40 L 108 112 Q 108 120 100 120 L 24 120 Q 16 120 16 112 L 16 20 Q 16 12 24 12 Z" fill="#000000" opacity="0.45" />
+  <path d="M 22 8 L 78 8 L 106 36 L 106 108 Q 106 116 98 116 L 22 116 Q 14 116 14 108 L 14 16 Q 14 8 22 8 Z" fill="url(#unkBg)" stroke="url(#unkBorder)" stroke-width="2.5" />
+  <path d="M 78 8 L 78 28 Q 78 36 86 36 L 106 36 Z" fill="#2E1065" stroke="url(#unkBorder)" stroke-width="2" stroke-linejoin="round" />
+
+  <circle cx="60" cy="66" r="40" fill="url(#mysteryGlow)" />
+
+  <circle cx="60" cy="66" r="31" fill="none" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.7" />
+  <polygon points="60,31 63,35 60,39 57,35" fill="#A78BFA" opacity="0.8" />
+  <polygon points="29,66 33,63 37,66 33,69" fill="#38BDF8" opacity="0.7" />
+  <polygon points="91,66 87,63 83,66 87,69" fill="#38BDF8" opacity="0.7" />
+
+  <path d="M 47 51 C 47 39, 73 39, 73 51 C 73 59, 60 61, 60 72" fill="none" stroke="#090D16" stroke-width="10" stroke-linecap="round" opacity="0.5" />
+  <path d="M 47 51 C 47 39, 73 39, 73 51 C 73 59, 60 61, 60 72" fill="none" stroke="url(#mysteryGold)" stroke-width="7" stroke-linecap="round" />
+
+  <polygon points="60,82 67,89 60,96 53,89" fill="url(#mysteryGold)" stroke="#451A03" stroke-width="1.2" stroke-linejoin="round" />
+  <polygon points="60,84.5 64.5,89 60,93.5 55.5,89" fill="url(#orbDot)" />
+
+  <path d="M 22 100 L 22 108 L 30 108" fill="none" stroke="#6D28D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" />
+  <path d="M 98 100 L 98 108 L 90 108" fill="none" stroke="#6D28D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" />
+</svg>

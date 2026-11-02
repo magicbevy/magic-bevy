@@ -37,7 +37,7 @@ pub struct RawManifest {
     #[serde(default)]
     pub magic: Option<String>,
     #[serde(default = "default_channel")]
-    pub channel: String, // (stable, preview, etc.)
+    pub channel: String,
     #[serde(default)]
     pub description: Option<String>,
     #[serde(default)]
