@@ -1,14 +1,14 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use magic_api::RuntimeRegistry;
+
+#[unsafe(no_mangle)]
+pub extern "Rust" fn register_all_packages(registry: &mut RuntimeRegistry) {
+    magic_pkg_runtime::register_all_packages(registry);
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn run() {
+    // Standalone game entry point. Package registration happens here.
+    let mut registry = RuntimeRegistry::new();
+    register_all_packages(&mut registry);
+    // TODO: init window/render/event loop and execute runtime packages.
+    println!("magic_runtime: {} packages registered", registry.registered);
 }

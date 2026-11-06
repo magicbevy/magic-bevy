@@ -3,7 +3,8 @@ members = [
     "magic_api",
     "magic_core",
     "magic_editor",
-    "magic_pkg"
+    "magic_pkg",
+    "magic_runtime"
 ]
 resolver = "2"
 

@@ -202,6 +202,9 @@ impl MagicBevyApp {
             app.tx.clone(),
             Arc::clone(&app.is_compiling),
             cc.egui_ctx.clone(),
+            true,
+            true,
+            true,
         );
 
         EngineCompilerState::global().unlock_watcher();
@@ -672,6 +675,9 @@ impl eframe::App for MagicBevyApp {
                     self.tx.clone(),
                     Arc::clone(&self.is_compiling),
                     ui.ctx().clone(),
+                    true,
+                    true,
+                    true,
                 );
             }
         }
@@ -685,6 +691,9 @@ impl eframe::App for MagicBevyApp {
                     self.compiler_manager.set_success();
                     self.reload_and_load_library();
                     magic_core::request_grimoire_refresh();
+                }
+                CompilerMessage::RuntimeBuildSuccess => {
+                    magic_core::mgprint!("HotReload", "Runtime build succeeded.");
                 }
                 CompilerMessage::CompileError(err) => {
                     self.compiler_manager.set_error(&err);

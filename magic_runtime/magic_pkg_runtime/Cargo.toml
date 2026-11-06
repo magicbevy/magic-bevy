@@ -6,4 +6,4 @@ edition = "2024"
 
 [dependencies]
 
-magic_core = { path = "../../magic_core" }
+magic_api = { path = "../../magic_api" }

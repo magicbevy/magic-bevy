@@ -3,6 +3,14 @@ name = "magic_runtime"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "magic_runtime"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "magic_runtime"
+path = "src/main.rs"
+
 [dependencies]
-magic_core = { path = "../magic_core" }
-magic_pkg_runtime = { path = "magic_pkg_runtime"}
+magic_api = { path = "../magic_api" }
+magic_pkg_runtime = { path = "magic_pkg_runtime" }
