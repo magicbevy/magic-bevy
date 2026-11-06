@@ -622,6 +622,7 @@ impl GrimoireWindow {
         self.selected_paths.insert(path.clone());
         self.last_selected = Some(path.clone());
 
+        crate::ui::inspector::set_inspector_target_file(path.clone());
         if let Ok(mut reg) = global_asset_registry().lock() {
             reg.set_selected_path(Some(path));
         }
