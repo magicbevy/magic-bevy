@@ -20,6 +20,7 @@ const TEXT_MUTED: Color32 = Color32::from_rgb(140, 147, 168);
 #[derive(Clone)]
 pub enum InspectorTarget {
     File(PathBuf),
+    Files(Vec<PathBuf>),
     Custom(String),
 }
 
@@ -39,6 +40,24 @@ fn inspector_registry() -> &'static Arc<Mutex<HashMap<String, InspectorDrawFn>>>
 pub fn set_inspector_target(target: InspectorTarget) {
     if let Ok(mut t) = target_store().lock() {
         *t = Some(target);
+    }
+}
+
+pub fn clear_inspector_target() {
+    if let Ok(mut t) = target_store().lock() {
+        *t = None;
+    }
+}
+
+pub fn set_inspector_target_files(paths: Vec<PathBuf>) {
+    if paths.is_empty() {
+        clear_inspector_target();
+        return;
+    }
+    if paths.len() == 1 {
+        set_inspector_target(InspectorTarget::File(paths[0].clone()));
+    } else {
+        set_inspector_target(InspectorTarget::Files(paths));
     }
 }
 
@@ -468,6 +487,88 @@ impl EditorWindow for InspectorWindow {
         egui::ScrollArea::vertical()
             .auto_shrink([false, false])
             .show(ui, |ui| match target {
+                InspectorTarget::Files(paths) => {
+                    if paths.is_empty() {
+                        ui.weak("No Artifact Selected");
+                        return;
+                    }
+                    if paths.len() == 1 {
+                        // fall through handled by File variant ideally; render as file
+                    }
+
+                    // Determine if all share the same extension
+                    let exts: Vec<String> = paths
+                        .iter()
+                        .map(|p| p.extension().and_then(|e| e.to_str()).unwrap_or("").to_lowercase())
+                        .collect();
+                    let all_same_ext = exts.windows(2).all(|w| w[0] == w[1]);
+                    let common_ext = exts.first().cloned().unwrap_or_default();
+
+                    egui::Frame::group(ui.style())
+                        .fill(ITEM_BG)
+                        .stroke(Stroke::new(1.0, BORDER_COLOR))
+                        .inner_margin(10.0)
+                        .show(ui, |ui| {
+                            ui.horizontal(|ui| {
+                                ui.label(RichText::new(egui_phosphor::regular::SELECTION_ALL).size(20.0).color(ACCENT_PURPLE));
+                                ui.vertical(|ui| {
+                                    ui.label(RichText::new(format!("{} items selected", paths.len())).strong().color(TEXT_MAIN).size(14.0));
+                                    if all_same_ext {
+                                        if common_ext.is_empty() {
+                                            ui.label(RichText::new("Mixed files".to_string()).color(TEXT_MUTED).size(11.5));
+                                        } else {
+                                            ui.label(RichText::new(format!(".{} files", common_ext.to_uppercase())).color(ACCENT_CYAN).size(11.5));
+                                        }
+                                    } else {
+                                        let mut counts: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+                                        for e in &exts {
+                                            let key = if e.is_empty() { "no ext".to_string() } else { format!(".{}", e) };
+                                            *counts.entry(key).or_insert(0) += 1;
+                                        }
+                                        let summary: Vec<String> = counts.iter().map(|(k, v)| format!("{} x{}", k, v)).collect();
+                                        ui.label(RichText::new(summary.join(", ")).color(TEXT_MUTED).size(11.5));
+                                    }
+                                });
+                            });
+                        });
+
+                    ui.add_space(8.0);
+
+                    // Try package inspector for same format
+                    let mut handled = false;
+                    if all_same_ext {
+                        if let Some(first) = paths.first() {
+                            if let Ok(mut reg) = global_asset_registry().lock() {
+                                if let Some(desc) = reg.get_mut_by_path(first) {
+                                    if let Some(inspect_fn) = desc.on_inspect.as_mut() {
+                                        handled = true;
+                                        egui::Frame::group(ui.style())
+                                            .fill(BG_PANEL)
+                                            .stroke(Stroke::new(1.0, BORDER_COLOR))
+                                            .inner_margin(10.0)
+                                            .show(ui, |ui| {
+                                                (inspect_fn)(ui, &paths);
+                                            });
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if !handled {
+                        // default multi summary
+                        egui::Frame::group(ui.style())
+                            .fill(BG_PANEL)
+                            .stroke(Stroke::new(1.0, BORDER_COLOR))
+                            .inner_margin(10.0)
+                            .show(ui, |ui| {
+                                let total: u64 = paths.iter().filter_map(|p| std::fs::metadata(p).ok().map(|m| m.len())).sum();
+                                ui.label(RichText::new(format!("Total size: {}", Self::format_size(total))).color(TEXT_MUTED).size(11.5));
+                                ui.add_space(4.0);
+                                ui.label(RichText::new("Select a single item for detailed properties.").color(TEXT_MUTED).size(11.0));
+                            });
+                    }
+                }
                 InspectorTarget::File(path) => {
                     if !path.exists() {
                         egui::Frame::group(ui.style())
@@ -572,7 +673,7 @@ impl EditorWindow for InspectorWindow {
                                     .stroke(Stroke::new(1.0, BORDER_COLOR))
                                     .inner_margin(10.0)
                                     .show(ui, |ui| {
-                                        (inspect_fn)(ui, &path);
+                                        (inspect_fn)(ui, std::slice::from_ref(&path));
                                     });
                             }
                         }

@@ -633,6 +633,7 @@ impl GrimoireWindow {
             self.current_dir = path.to_path_buf();
             self.selected_paths.clear();
             self.last_selected = None;
+            crate::ui::inspector::clear_inspector_target();
             self.refresh();
             return;
         }
@@ -692,6 +693,7 @@ impl GrimoireWindow {
         if moved_count > 0 {
             self.selected_paths.clear();
             self.last_selected = None;
+            crate::ui::inspector::clear_inspector_target();
             self.refresh();
             self.status_message = Some((format!("Moved {} item(s).", moved_count), false));
         }
@@ -1491,6 +1493,7 @@ impl GrimoireWindow {
                     self.selected_paths.insert(entry.path.clone());
                     self.last_selected = Some(entry.path.clone());
                 }
+                crate::ui::inspector::set_inspector_target_files(self.selected_paths.iter().cloned().collect());
             } else {
                 self.select_single_item(entry.path.clone());
             }
@@ -2332,6 +2335,7 @@ impl EditorWindow for GrimoireWindow {
                     if empty_resp.clicked() {
                         self.selected_paths.clear();
                         self.last_selected = None;
+                        crate::ui::inspector::clear_inspector_target();
                         if self.rename_target.is_some() {
                             let target = self.rename_target.clone().unwrap();
                             let new_name = self.rename_new_name.trim().to_string();

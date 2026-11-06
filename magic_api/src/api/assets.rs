@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 pub type CreateAssetFn =
     Box<dyn Fn(&Path, &str) -> Result<PathBuf, String> + Send + Sync + 'static>;
 pub type OpenAssetFn = Box<dyn Fn(&Path) + Send + Sync + 'static>;
-pub type InspectAssetFn = Box<dyn FnMut(&mut egui::Ui, &Path) + Send + 'static>;
+pub type InspectAssetFn = Box<dyn FnMut(&mut egui::Ui, &[PathBuf]) + Send + 'static>;
 
 pub struct AssetTypeDescriptor {
     pub extension: String,
@@ -120,6 +120,20 @@ impl AssetTypeDescriptor {
     pub fn on_inspect<F>(mut self, callback: F) -> Self
     where
         F: FnMut(&mut egui::Ui, &Path) + Send + 'static,
+    {
+        // adapt single-path callback to slice API
+        let mut cb = callback;
+        self.on_inspect = Some(Box::new(move |ui, paths| {
+            if let Some(p) = paths.first() {
+                cb(ui, p);
+            }
+        }));
+        self
+    }
+
+    pub fn on_inspect_many<F>(mut self, callback: F) -> Self
+    where
+        F: FnMut(&mut egui::Ui, &[PathBuf]) + Send + 'static,
     {
         self.on_inspect = Some(Box::new(callback));
         self
