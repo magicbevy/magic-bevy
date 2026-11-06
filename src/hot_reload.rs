@@ -37,37 +37,24 @@ pub fn execute_compile(
 
     let ctx_clone = ctx.clone();
     thread::spawn(move || {
-        let check_output = Command::new("cargo")
-            .args(["check", "-p", "magic_editor", "--message-format=short"])
+        // Skip the separate `cargo check` pass: `cargo build` already
+        // reports compile errors, so running both was doubling work.
+        let build_output = Command::new("cargo")
+            .args(["build", "-p", "magic_editor", "--lib"])
             .output();
 
-        if let Ok(output) = check_output {
-            if output.status.success() {
-                let build_output = Command::new("cargo")
-                    .args(["build", "-p", "magic_editor", "--lib"])
-                    .output();
-
-                if build_output.is_ok() && build_output.as_ref().unwrap().status.success() {
-                    let _ = tx.send(CompilerMessage::CompileSuccess);
-                } else {
-                    let err = if let Ok(out) = build_output {
-                        String::from_utf8_lossy(&out.stderr).to_string()
-                    } else {
-                        "Build failed: unable to capture cargo output.".to_string()
-                    };
-                    let _ = tx.send(CompilerMessage::CompileError(
-                        format!("Build failed.\n{}", err),
-                    ));
-                }
+        if let Ok(out) = build_output {
+            if out.status.success() {
+                let _ = tx.send(CompilerMessage::CompileSuccess);
             } else {
-                let err = String::from_utf8_lossy(&output.stderr).to_string();
+                let err = String::from_utf8_lossy(&out.stderr).to_string();
                 let _ = tx.send(CompilerMessage::CompileError(
-                    format!("Cargo check failed.\n{}", err),
+                    format!("Build failed.\n{}", err),
                 ));
             }
         } else {
             let _ = tx.send(CompilerMessage::CompileError(
-                "Failed to invoke cargo check.".to_string(),
+                "Failed to invoke cargo build.".to_string(),
             ));
         }
 
@@ -99,7 +86,7 @@ pub fn init_file_watcher(
                 let compiling = *is_compiling_clone.lock().unwrap();
                 let last_event_time = *last_change_clone.lock().unwrap();
 
-                if !compiling && last_event_time.elapsed() >= Duration::from_millis(1500) {
+                if !compiling && last_event_time.elapsed() >= Duration::from_millis(1000) {
                     *is_pending = false;
                     MagicBevyApp::execute_compile_static(
                         tx_clone.clone(),
