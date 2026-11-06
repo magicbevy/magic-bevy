@@ -1,10 +1,20 @@
 [workspace]
 members = [
     "magic_core",
-    "magic_editor",   
+    "magic_editor",
     "magic_pkg"
 ]
 resolver = "2"
+
+[workspace.dependencies]
+egui = "0.36"
+eframe = "0.36"
+egui-phosphor = "0.14"
+egui_dock = { version = "0.21", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "1.1.6"
+notify = "8.1.0"
 
 [package]
 name = "magic-bevy"
@@ -16,9 +26,9 @@ magic_core = { path = "magic_core" }
 magic_pkg = { path = "magic_pkg" }
 
 libloading = "0.8"
-eframe = "0.36"
-egui = "0.36"
-egui-phosphor = "0.14"
-egui_dock = { version = "0.21", features = ["serde"] }
-notify = "8.1.0"
-serde_json = "1"
+eframe = { workspace = true }
+egui = { workspace = true }
+egui-phosphor = { workspace = true }
+egui_dock = { workspace = true }
+notify = { workspace = true }
+serde_json = { workspace = true }
