@@ -8,5 +8,5 @@ name = "magic_editor"
 crate-type = ["cdylib"]
 
 [dependencies]
-magic_core = { path = "../magic_core" }
+magic_api = { path = "../magic_api" }
 magic_pkg_editor = { path = "magic_pkg_editor"}

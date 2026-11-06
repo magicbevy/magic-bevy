@@ -382,7 +382,7 @@ pub fn update_editor_lib_register(
 
     let mut body = String::new();
     body.push_str(&format!("{AUTO_RS_HEADER}\n\n"));
-    body.push_str("use magic_core::EditorRegistry;\n");
+    body.push_str("use magic_api::EditorRegistry;\n");
     body.push_str("pub fn register_all_packages(_registry: &mut EditorRegistry) {\n");
 
     for alias in aliases {
@@ -413,7 +413,7 @@ pub fn update_runtime_lib_register(
 
     let mut body = String::new();
     body.push_str(&format!("{AUTO_RS_HEADER}\n\n"));
-    body.push_str("use magic_core::RuntimeRegistry;\n");
+    body.push_str("use magic_api::RuntimeRegistry;\n");
     body.push_str("pub fn register_all_packages(_registry: &mut RuntimeRegistry) {\n");
 
     for alias in aliases {

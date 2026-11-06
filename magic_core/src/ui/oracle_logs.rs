@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use crate::log::{global_store, LogLevel};
+use magic_api::log::{global_store, LogLevel};
 use chrono::Timelike;
 use eframe::egui::{self, Color32, RichText, Sense, Stroke};
 
@@ -60,6 +60,16 @@ struct LogItem {
 }
 
 impl OracleLogsWindow {
+    fn level_color(level: &LogLevel) -> egui::Color32 {
+        match level {
+            LogLevel::Info => egui::Color32::from_rgb(100, 200, 255),
+            LogLevel::Warn => egui::Color32::from_rgb(255, 200, 50),
+            LogLevel::Error => egui::Color32::from_rgb(255, 80, 80),
+            LogLevel::Success => egui::Color32::from_rgb(100, 255, 100),
+            LogLevel::Debug => egui::Color32::from_rgb(200, 200, 200),
+        }
+    }
+
     pub fn new() -> Self {
         Self {
             items: Vec::new(),
@@ -269,7 +279,7 @@ impl OracleLogsWindow {
                         egui_phosphor::regular::X_CIRCLE,
                         "ERR",
                         self.count_error,
-                        LogLevel::Error.color_code(),
+                        Self::level_color(&LogLevel::Error),
                     );
                     Self::draw_filter_pill(
                         ui,
@@ -277,7 +287,7 @@ impl OracleLogsWindow {
                         egui_phosphor::regular::WARNING,
                         "WARN",
                         self.count_warn,
-                        LogLevel::Warn.color_code(),
+                        Self::level_color(&LogLevel::Warn),
                     );
                     Self::draw_filter_pill(
                         ui,
@@ -285,7 +295,7 @@ impl OracleLogsWindow {
                         "ℹ",
                         "INFO",
                         self.count_info,
-                        LogLevel::Info.color_code(),
+                        Self::level_color(&LogLevel::Info),
                     );
                     Self::draw_filter_pill(
                         ui,
@@ -293,7 +303,7 @@ impl OracleLogsWindow {
                         egui_phosphor::regular::CHECK_CIRCLE,
                         "OK",
                         self.count_success,
-                        LogLevel::Success.color_code(),
+                        Self::level_color(&LogLevel::Success),
                     );
                     Self::draw_filter_pill(
                         ui,
@@ -301,7 +311,7 @@ impl OracleLogsWindow {
                         egui_phosphor::regular::GEAR,
                         "DBG",
                         self.count_debug,
-                        LogLevel::Debug.color_code(),
+                        Self::level_color(&LogLevel::Debug),
                     );
 
                     ui.separator();
@@ -347,7 +357,7 @@ impl OracleLogsWindow {
                             let is_expanded = self.expanded.contains(&id);
                             let is_selected = self.selected.contains(&id);
                             let marker = if is_expanded { "▾" } else { "▸" };
-                            let level_color = item.level.color_code();
+                            let level_color = Self::level_color(&item.level);
                             let icon = self.level_icon(&item.level);
                             let level_tag = item.level.tag().to_string();
                             let time = item.time.clone();
@@ -621,8 +631,8 @@ fn extract_file_line(msg: &str) -> Option<String> {
     None
 }
 
-impl crate::api::window::EditorWindow for OracleLogsWindow {
-    fn id(&self) -> crate::api::window::WindowId {
+impl magic_api::api::window::EditorWindow for OracleLogsWindow {
+    fn id(&self) -> magic_api::api::window::WindowId {
         "oracle_logs".to_string()
     }
 

@@ -1,4 +1,4 @@
-use magic_core::mgprint;
+use magic_api::mgprint;
 
 use super::system::EditorSystem;
 

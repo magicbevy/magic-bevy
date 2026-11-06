@@ -21,16 +21,6 @@ impl LogLevel {
             LogLevel::Debug => "DEBUG",
         }
     }
-
-    pub fn color_code(&self) -> egui::Color32 {
-        match self {
-            LogLevel::Info => egui::Color32::from_rgb(100, 200, 255),
-            LogLevel::Warn => egui::Color32::from_rgb(255, 200, 50),
-            LogLevel::Error => egui::Color32::from_rgb(255, 80, 80),
-            LogLevel::Success => egui::Color32::from_rgb(100, 255, 100),
-            LogLevel::Debug => egui::Color32::from_rgb(200, 200, 200),
-        }
-    }
 }
 
 #[derive(Debug, Clone)]

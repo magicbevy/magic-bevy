@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use magic_core::{mgerror, mgprint, mgsuccess, mgwarn};
+use magic_api::{mgerror, mgprint, mgsuccess, mgwarn};
 use magic_pkg::{PackageManager, PackageManifest, PackageTarget};
 use std::path::PathBuf;
 

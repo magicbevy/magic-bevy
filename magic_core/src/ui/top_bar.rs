@@ -1,5 +1,5 @@
-use crate::api::{MenuItem, MenuRegistry};
-use crate::status::CompileStatus;
+use magic_api::api::{MenuItem, MenuRegistry};
+use magic_api::status::CompileStatus;
 use crate::ui::indicator::draw_status_indicator;
 use eframe::egui::{self, RichText};
 

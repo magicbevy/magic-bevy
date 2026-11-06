@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "magic_api",
     "magic_core",
     "magic_editor",
     "magic_pkg"
@@ -32,3 +33,9 @@ egui-phosphor = { workspace = true }
 egui_dock = { workspace = true }
 notify = { workspace = true }
 serde_json = { workspace = true }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

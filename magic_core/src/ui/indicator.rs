@@ -1,6 +1,6 @@
 
 use eframe::egui;
-use crate::status::CompileStatus;
+use magic_api::status::CompileStatus;
 
 pub fn draw_status_indicator(ctx: &egui::Context, ui: &mut egui::Ui, status: &CompileStatus) {
     ui.horizontal(|ui| {

@@ -1,5 +1,5 @@
-use crate::api::assets::global_asset_registry;
-use crate::api::window::{EditorWindow, WindowId};
+use magic_api::api::assets::global_asset_registry;
+use magic_api::api::window::{EditorWindow, WindowId};
 use eframe::egui::{self, Color32, RichText, Stroke};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};

@@ -2251,6 +2251,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "magic_api"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "colored",
+ "eframe",
+ "egui",
+ "serde",
+]
+
+[[package]]
 name = "magic_core"
 version = "0.1.0"
 dependencies = [
@@ -2259,6 +2270,7 @@ dependencies = [
  "eframe",
  "egui",
  "egui-phosphor",
+ "magic_api",
  "resvg",
  "serde",
  "tiny-skia 0.12.0",
@@ -2270,7 +2282,7 @@ dependencies = [
 name = "magic_editor"
 version = "0.1.0"
 dependencies = [
- "magic_core",
+ "magic_api",
  "magic_pkg_editor",
 ]
 
@@ -2279,7 +2291,7 @@ name = "magic_pkg"
 version = "0.1.0"
 dependencies = [
  "clap",
- "magic_core",
+ "magic_api",
  "serde",
  "toml",
  "ureq",
@@ -2290,7 +2302,7 @@ dependencies = [
 name = "magic_pkg_editor"
 version = "0.1.0"
 dependencies = [
- "magic_core",
+ "magic_api",
 ]
 
 [[package]]

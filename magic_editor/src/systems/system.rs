@@ -1,4 +1,4 @@
-use magic_core::egui;
+use magic_api::egui;
 
 pub trait EditorSystem: Send + Sync {
     fn on_enable(&mut self);

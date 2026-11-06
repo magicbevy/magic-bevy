@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+magic_api = { path = "../magic_api" }
 eframe = { workspace = true }
 egui = { workspace = true }
 egui-phosphor = { workspace = true }
