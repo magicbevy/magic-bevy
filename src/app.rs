@@ -127,6 +127,13 @@ impl EngineTheme {
     }
 }
 
+fn host_push_log(level: magic_core::log::LogLevel, source: &str, msg: &str) {
+    let entry = magic_core::log::LogEntry::new(level, msg, source);
+    if let Ok(mut store) = magic_core::log::global_store().lock() {
+        store.push(entry);
+    }
+}
+
 pub struct MagicBevyApp {
     menu_registry: MenuRegistry,
     editor_events: EditorEventRegistry,
@@ -292,6 +299,7 @@ impl MagicBevyApp {
                             windows: &mut self.windows,
                             assets: &mut *asset_guard,
                             open_window_tx: self.window_manager.tx.clone(),
+                            log_fn: Some(host_push_log),
                         };
 
                         register_all_packages(&mut editor_registry);
@@ -693,6 +701,7 @@ impl eframe::App for MagicBevyApp {
                     magic_core::request_grimoire_refresh();
                 }
                 CompilerMessage::RuntimeBuildSuccess => {
+                    self.compiler_manager.set_success();
                     magic_core::mgprint!("HotReload", "Runtime build succeeded.");
                 }
                 CompilerMessage::CompileError(err) => {

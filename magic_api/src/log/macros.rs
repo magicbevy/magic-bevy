@@ -2,26 +2,12 @@
 macro_rules! oracle_info {
     ($source:expr, $msg:expr) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Info,
-                $msg,
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Info, $source, $msg.into());
         }
     };
     ($source:expr, $fmt:expr, $($arg:tt)*) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Info,
-                format!($fmt, $($arg)*),
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Info, $source, format!($fmt, $($arg)*));
         }
     };
 }
@@ -30,26 +16,12 @@ macro_rules! oracle_info {
 macro_rules! oracle_warn {
     ($source:expr, $msg:expr) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Warn,
-                $msg,
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Warn, $source, $msg.into());
         }
     };
     ($source:expr, $fmt:expr, $($arg:tt)*) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Warn,
-                format!($fmt, $($arg)*),
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Warn, $source, format!($fmt, $($arg)*));
         }
     };
 }
@@ -58,26 +30,12 @@ macro_rules! oracle_warn {
 macro_rules! oracle_error {
     ($source:expr, $msg:expr) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Error,
-                $msg,
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Error, $source, $msg.into());
         }
     };
     ($source:expr, $fmt:expr, $($arg:tt)*) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Error,
-                format!($fmt, $($arg)*),
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Error, $source, format!($fmt, $($arg)*));
         }
     };
 }
@@ -86,26 +44,12 @@ macro_rules! oracle_error {
 macro_rules! oracle_success {
     ($source:expr, $msg:expr) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Success,
-                $msg,
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Success, $source, $msg.into());
         }
     };
     ($source:expr, $fmt:expr, $($arg:tt)*) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Success,
-                format!($fmt, $($arg)*),
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Success, $source, format!($fmt, $($arg)*));
         }
     };
 }
@@ -114,26 +58,12 @@ macro_rules! oracle_success {
 macro_rules! oracle_debug {
     ($source:expr, $msg:expr) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Debug,
-                $msg,
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Debug, $source, $msg.into());
         }
     };
     ($source:expr, $fmt:expr, $($arg:tt)*) => {
         {
-            let entry = $crate::log::LogEntry::new(
-                $crate::log::LogLevel::Debug,
-                format!($fmt, $($arg)*),
-                $source,
-            );
-            if let Ok(mut store) = $crate::log::global_store().lock() {
-                store.push(entry);
-            }
+            $crate::log::push_log($crate::log::LogLevel::Debug, $source, format!($fmt, $($arg)*));
         }
     };
 }
