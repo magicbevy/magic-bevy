@@ -87,7 +87,7 @@ pub fn execute_compile(
 
         if build_runtime && err_msg.is_empty() {
             let out = std::process::Command::new("cargo")
-                .args(["build", "-p", "magic_runtime"])
+                .args(["build", "-p", "magic_runtime", "--lib"])
                 .output();
             match out {
                 Ok(o) if o.status.success() => {}
