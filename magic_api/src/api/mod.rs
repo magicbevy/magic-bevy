@@ -11,7 +11,7 @@ pub mod editor;
 
 pub use events::EditorEventRegistry;
 pub use menu::{MenuItem, MenuRegistry};
-pub use runtime::RuntimeRegistry;
+pub use runtime::{RuntimeRegistry, UpdateRegistry};
 
 #[cfg(feature = "ui")]
 pub use assets::{AssetTypeDescriptor, AssetTypeRegistry, global_asset_registry};
