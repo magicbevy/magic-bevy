@@ -26,6 +26,7 @@ edition = "2024"
 [dependencies]
 magic_core = { path = "magic_core" }
 magic_pkg = { path = "magic_pkg" }
+magic_api = { path = "magic_api" }
 
 libloading = "0.8"
 eframe = { workspace = true }
@@ -34,6 +35,8 @@ egui-phosphor = { workspace = true }
 egui_dock = { workspace = true }
 notify = { workspace = true }
 serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+toml = { workspace = true }
 
 [profile.release]
 lto = "thin"

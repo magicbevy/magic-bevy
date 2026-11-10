@@ -1,0 +1,103 @@
+{
+  "surfaces": [
+    {
+      "Main": {
+        "nodes": [
+          {
+            "Horizontal": {
+              "rect": {
+                "min": {
+                  "x": 0.0,
+                  "y": 39.5
+                },
+                "max": {
+                  "x": 1366.0,
+                  "y": 699.0
+                }
+              },
+              "fraction": 0.2803379,
+              "fully_collapsed": false,
+              "collapsed_leaf_count": 0
+            }
+          },
+          {
+            "Leaf": {
+              "rect": {
+                "min": {
+                  "x": 0.0,
+                  "y": 39.5
+                },
+                "max": {
+                  "x": 381.0,
+                  "y": 699.0
+                }
+              },
+              "viewport": {
+                "min": {
+                  "x": 0.0,
+                  "y": 69.5
+                },
+                "max": {
+                  "x": 381.0,
+                  "y": 699.0
+                }
+              },
+              "tabs": [
+                {
+                  "window_id": "oracle_logs",
+                  "instance_id": 1
+                },
+                {
+                  "window_id": "inspector",
+                  "instance_id": 2
+                }
+              ],
+              "active": 0,
+              "scroll": 0.0,
+              "collapsed": false,
+              "tab_bar_hidden": false
+            }
+          },
+          {
+            "Leaf": {
+              "rect": {
+                "min": {
+                  "x": 384.0,
+                  "y": 39.5
+                },
+                "max": {
+                  "x": 1366.0,
+                  "y": 699.0
+                }
+              },
+              "viewport": {
+                "min": {
+                  "x": 384.0,
+                  "y": 69.5
+                },
+                "max": {
+                  "x": 1366.0,
+                  "y": 699.0
+                }
+              },
+              "tabs": [
+                {
+                  "window_id": "grimoire",
+                  "instance_id": 3
+                }
+              ],
+              "active": 0,
+              "scroll": 0.0,
+              "collapsed": false,
+              "tab_bar_hidden": false
+            }
+          }
+        ],
+        "focused_node": 2,
+        "collapsed": false,
+        "collapsed_leaf_count": 0
+      }
+    }
+  ],
+  "focused_surface": 0
+}

@@ -1,0 +1,4 @@
+[[releases]]
+version = "0.1.0"
+channel = "stable"
+portal = "0.1.0"

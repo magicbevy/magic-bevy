@@ -2244,10 +2244,13 @@ dependencies = [
  "egui-phosphor",
  "egui_dock",
  "libloading",
+ "magic_api",
  "magic_core",
  "magic_pkg",
  "notify",
+ "serde",
  "serde_json",
+ "toml",
 ]
 
 [[package]]

@@ -1,12 +1,27 @@
 mod app;
+mod engine_version;
 mod hot_reload;
 mod windows;
 mod layouts;
 
+use magic_api::mgwarn;
 use magic_core::*;
+use std::env;
 use std::panic;
 
 fn main() -> Result<(), eframe::Error> {
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() > 1 && args[1] == "bump" {
+        return match engine_version::bump() {
+            Ok(()) => Ok(()),
+            Err(e) => {
+                mgwarn!(engine_version::TAG, format!("engine bump failed: {e}"));
+                Ok(())
+            }
+        };
+    }
+
     panic::set_hook(Box::new(|info| {
         let payload = if let Some(s) = info.payload().downcast_ref::<&str>() {
             s.to_string()
