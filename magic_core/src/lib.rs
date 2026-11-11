@@ -1,4 +1,9 @@
-pub use magic_api::*;
+pub use magic_api_editor::*;
+pub use magic_log::{
+    global_store, mgerror, mgprint, mgsuccess, mgwarn, oracle_debug, oracle_error, oracle_info,
+    oracle_success, oracle_warn, LogEntry, LogLevel, LogStore,
+};
+pub use magic_log as log;
 
 pub mod ui;
 pub mod package_manager;

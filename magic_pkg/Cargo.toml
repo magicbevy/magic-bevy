@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-magic_api = { path = "../magic_api", default-features = false }
+magic_log = { path = "../magic_log" }
 clap = { version = "4.6.7", features = ["derive"] }
 serde = { workspace = true }
 toml = { workspace = true }

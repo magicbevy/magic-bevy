@@ -1,5 +1,6 @@
-use magic_api::{RuntimeRegistry, UpdateRegistry, mgsuccess};
-use magic_api::api::runtime::RenderContext;
+use magic_api_runtime::api::runtime::RenderContext;
+use magic_api_runtime::{RuntimeRegistry, UpdateRegistry};
+use magic_log::mgsuccess;
 use std::sync::{Arc, Mutex};
 
 fn main() {

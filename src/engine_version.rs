@@ -1,4 +1,4 @@
-use magic_api::{mgprint, mgsuccess};
+use magic_log::{mgprint, mgsuccess};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;

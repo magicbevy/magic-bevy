@@ -68,7 +68,11 @@ impl UpdateRegistry {
         let mut last_time = Instant::now();
 
         loop {
-            let current_fps = if self.target_fps > 0.0 { self.target_fps } else { 60.0 };
+            let current_fps = if self.target_fps > 0.0 {
+                self.target_fps
+            } else {
+                60.0
+            };
             let frame_duration = Duration::from_secs_f32(1.0 / current_fps);
 
             let now = Instant::now();
@@ -91,6 +95,6 @@ impl UpdateRegistry {
 
 pub struct RuntimeRegistry<'a> {
     pub render_context: Arc<Mutex<RenderContext>>,
-    pub log_fn: Option<fn(crate::log::LogLevel, &str, &str)>,
+    pub log_fn: Option<fn(magic_log::LogLevel, &str, &str)>,
     pub updates: &'a mut UpdateRegistry,
 }

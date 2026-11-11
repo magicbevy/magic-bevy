@@ -21,8 +21,8 @@ use std::process::Command;
 use eframe::egui::{self, Color32, Key, RichText, Sense, Stroke, Vec2};
 
 use super::types::{PackageInfo, ViewMode};
-use magic_api::api::assets::global_asset_registry;
-use magic_api::api::window::{EditorWindow, WindowId};
+use magic_api_editor::api::assets::global_asset_registry;
+use magic_api_editor::api::window::{EditorWindow, WindowId};
 
 const COLOR_SUCCESS: Color32 = Color32::from_rgb(34, 197, 94);
 

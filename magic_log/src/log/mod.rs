@@ -1,5 +1,5 @@
-pub mod store;
 pub mod macros;
+pub mod store;
 
 pub use store::{LogEntry, LogLevel, LogStore, global_store};
 

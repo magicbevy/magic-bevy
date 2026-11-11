@@ -1,8 +1,10 @@
 [workspace]
 members = [
-    "magic_api",
+    "magic_api_editor",
+    "magic_api_runtime",
     "magic_core",
     "magic_editor",
+    "magic_log",
     "magic_pkg",
     "magic_runtime"
 ]
@@ -26,7 +28,7 @@ edition = "2024"
 [dependencies]
 magic_core = { path = "magic_core" }
 magic_pkg = { path = "magic_pkg" }
-magic_api = { path = "magic_api" }
+magic_log = { path = "magic_log" }
 
 libloading = "0.8"
 eframe = { workspace = true }

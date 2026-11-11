@@ -6,7 +6,9 @@ pub trait EditorWindow: Send + Sync {
     fn id(&self) -> WindowId;
     fn title(&self) -> &str;
     fn draw(&mut self, ui: &mut egui::Ui);
-    fn save_state(&self) -> Option<String> { None }
+    fn save_state(&self) -> Option<String> {
+        None
+    }
     fn restore_state(&mut self, _state: &str) {}
 }
 
@@ -73,17 +75,25 @@ impl WindowInstances {
         }
     }
 
-    pub fn add(&mut self, window_id: WindowId, title: String, window: Box<dyn EditorWindow>) -> u64 {
+    pub fn add(
+        &mut self,
+        window_id: WindowId,
+        title: String,
+        window: Box<dyn EditorWindow>,
+    ) -> u64 {
         let id = self.next_id;
         self.next_id += 1;
-        self.instances.insert(id, WindowInstance {
+        self.instances.insert(
             id,
-            window_id,
-            title,
-            window,
-            open: true,
-            rect: None,
-        });
+            WindowInstance {
+                id,
+                window_id,
+                title,
+                window,
+                open: true,
+                rect: None,
+            },
+        );
         id
     }
 

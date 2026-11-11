@@ -6,7 +6,7 @@
 - **Formatting:** Standard rustfmt (no custom config found)
 - **Comments:** Minimal. Do not add comments unless asked (per project guidelines)
 - **Error handling:** Use `Result` with custom error enums (`PackageError` in `magic_pkg`)
-- **Logging:** Use `mgprint!`, `mgsuccess!`, `mgwarn!`, `mgerror!` macros from `magic_core::logger`
+- **Logging:** Use `mgprint!`, `mgsuccess!`, `mgwarn!`, `mgerror!`, and `oracle_*!` macros from `magic_log`
 - **String tags:** Use `const TAG: &str = "ModuleName";` at top of files that log
 
 ## Naming
@@ -22,14 +22,25 @@
 ## File Organization
 
 ```
-magic_core/src/
+magic_log/src/
+  lib.rs          # logging callback + re-exports
+  log/            # LogStore, LogEntry, LogLevel, mg/oracle macros
+  logger.rs       # colored mg* macros
+  oracle.rs       # oracle macro re-exports
+
+magic_api_editor/src/
   lib.rs          # module declarations + re-exports
   compiler.rs     # global compiler state
-  logger.rs       # colored macros
-  api/            # EditorRegistry, MenuRegistry, events, runtime
+  api/            # EditorRegistry, MenuRegistry, events, window, assets
   status/         # CompileStatus, CompilerStateManager
-  ui/             # top_bar, indicator
-  loader/         # editor_lib, package_reloader
+
+magic_api_runtime/src/
+  lib.rs          # runtime API re-exports
+  api/runtime.rs  # RenderDriver, RenderContext, UpdateRegistry, RuntimeRegistry
+
+magic_core/src/
+  lib.rs          # re-exports editor API + logging
+  ui/             # top_bar, indicator, oracle_logs, grimoire, inspector
   package_manager/ # empty
 
 magic_editor/src/

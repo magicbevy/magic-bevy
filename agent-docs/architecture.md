@@ -38,73 +38,50 @@ Contains:
 
 ---
 
-## 2. `magic_core` — Core Library
+## 2. API and Logging Crates
 
-Exposed modules (re-exported from `lib.rs`):
-- `api` — `EditorRegistry`, `EditorEventRegistry`, `MenuRegistry`, `RuntimeRegistry`
-- `status` — `CompilerStateManager`, `CompileStatus`
-- `compiler` — `CompilerLockMode`, `EngineCompilerState`
-- `ui` — `draw_top_bar` (from `top_bar`)
-- `package_manager` — empty module
-- `logger` — `mgprint!`, `mgwarn!`, `mgerror!`, `mgsuccess!` macros
+The former `magic_api` crate is split into three crates:
 
-### `EngineCompilerState` (`magic_core/src/compiler.rs`)
+### `magic_api_editor`
 
-Global singleton via `OnceLock`. Fields:
-- `lock_mode: Mutex<CompilerLockMode>` — `Free` or `EditorLock`. When `EditorLock`, file watcher ignores changes
-- `request_reload: Mutex<bool>` — when `true`, triggers recompile on next UI update
+Editor-facing package API.
 
-Methods:
-- `lock_watcher()` / `unlock_watcher()` — toggle lock mode
-- `trigger_recompile()` — set `request_reload = true`
+- `api/editor.rs` — `EditorRegistry` with menu, events, windows, assets, `open_window_tx`, and `log_fn`
+- `api/menu.rs` — `MenuRegistry`, `MenuItem`, `MenuEntry`
+- `api/events.rs` — `EditorEventRegistry` (compile start/success callbacks)
+- `api/window.rs` — `WindowId`, `EditorWindow`, `WindowRegistry`, `WindowInstances`, `WindowTab`
+- `api/assets.rs` — `AssetTypeRegistry` and asset descriptors
+- `compiler.rs` — `EngineCompilerState` global singleton
+- `status/compiler_state.rs` — `CompileStatus` and `CompilerStateManager`
 
-### `CompilerStateManager` (`magic_core/src/status/compiler_state.rs`)
+### `magic_api_runtime`
 
-Holds `CompileStatus`:
-- `Idle`
-- `Compiling { current_file: String, progress: usize }`
-- `Success`
-- `Error(String)`
+Runtime-facing package API.
 
-Methods: `set_compiling(file, progress)`, `set_success()`, `set_error(err)`
+- `api/runtime.rs` — `RenderDriver`, `RenderContext`, `UpdateRegistry`, `RuntimeRegistry`
 
-### `EditorRegistry` (`magic_core/src/api/editor.rs`)
+`RuntimeRegistry` contains the shared `RenderContext`, the update registry, and the host log callback.
 
-```rust
-pub struct EditorRegistry<'a> {
-    pub menu: &'a mut MenuRegistry,
-    pub events: &'a mut EditorEventRegistry,
-}
-```
+### `magic_log`
 
-Passed to `register_all_packages` so packages can register menu items and event callbacks.
+Shared logging crate used by editor, runtime, and CLI.
 
-### `MenuRegistry` (`magic_core/src/api/menu.rs`)
+- `log/store.rs` — `LogEntry`, `LogLevel`, `LogStore`, `global_store`
+- `log/macros.rs` — `oracle_info!`, `oracle_warn!`, `oracle_error!`, `oracle_success!`, `oracle_debug!`
+- `logger.rs` — `mgprint!`, `mgwarn!`, `mgerror!`, `mgsuccess!`
+- `set_log_callback()` / `push_log()` — route logs to the host or the global store
 
-- `menus: BTreeMap<String, Vec<MenuCommand>>`
-- `register(menu_name, label, callback)` — adds a command under a menu name
-- `clear()` — clears all menus
+`magic_core` re-exports `magic_api_editor` and the logging API for editor-side code. Runtime and CLI crates depend on `magic_api_runtime` / `magic_log` directly.
 
-### `EditorEventRegistry` (`magic_core/src/api/events.rs`)
+### Editor Host UI
 
-- `on_compile_start: Vec<EventCallback>`
-- `on_compile_success: Vec<EventCallback>`
-- `listen_compile_start(F)`, `listen_compile_success(F)`
+`magic_core/src/ui/` contains the editor windows:
 
-### `RuntimeRegistry` (`magic_core/src/api/runtime.rs`)
-
-Minimal: `pub data: &'a str`. Reserved for future runtime package registration.
-
-### UI Components
-
-- `ui/top_bar.rs` — `draw_top_bar(ctx, registry, compile_status)` — renders `TopBottomPanel` with menu buttons and status indicator on the right
-- `ui/indicator.rs` — `draw_status_indicator(ctx, ui, status)` — draws LED circle (gray=Idle, blinking blue=Compiling, green=Success, red=Error)
-- `logger.rs` — colored macros: tag in bright color, message in corresponding color (blue/red/yellow/green)
-
-### Loader (`magic_core/src/loader/`)
-
-- `editor_lib.rs` — `PackageManager` struct with `reload_editor()` that loads `libmagic_editor.so` and extracts `create_system` symbol (note: this symbol is NOT currently used by `magic_editor`, which exports `register_all_packages` instead)
-- `package_reloader.rs` — `PackageReloader` — reads `package.toml` manifests (legacy/unused path)
+- `top_bar.rs` — menu bar, layout controls, compile status
+- `indicator.rs` — compile status LED
+- `oracle_logs.rs` — Oracle Logs dockable window
+- `grimoire/` — unified file/package manager
+- `inspector.rs` — asset inspector
 
 ---
 
@@ -199,11 +176,12 @@ Wraps `packages.toml` with `dependencies: BTreeMap<String, String>` (key = `vend
 
 ## 5. `magic_runtime` — Runtime Crate
 
-Minimal crate with:
-- `pub fn add(left: u64, right: u64) -> u64`
-- Unit test `it_works`
+Runtime host crate with:
+- `register_all_packages(registry: &mut RuntimeRegistry)` — forwards the host log callback and registers runtime packages
+- `src/main.rs` — minimal update loop using `UpdateRegistry`
+- `magic_pkg_runtime/` sub-crate — auto-generated `register_all_packages`
 
-Contains `magic_pkg_runtime/` sub-crate (auto-generated, empty `register_all_packages`).
+Runtime packages depend on `magic_api_runtime`; logging goes through `magic_log`.
 
 ---
 

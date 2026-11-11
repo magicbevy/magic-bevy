@@ -4,7 +4,7 @@ mod hot_reload;
 mod windows;
 mod layouts;
 
-use magic_api::mgwarn;
+use magic_log::mgwarn;
 use magic_core::*;
 use std::env;
 use std::panic;
@@ -34,12 +34,12 @@ fn main() -> Result<(), eframe::Error> {
             .location()
             .map(|l| format!("{}:{}:{}", l.file(), l.line(), l.column()))
             .unwrap_or_default();
-        let entry = magic_core::log::LogEntry::new(
-            magic_core::log::LogLevel::Error,
+        let entry = magic_log::LogEntry::new(
+            magic_log::LogLevel::Error,
             format!("Panic at {}: {}", location, payload),
             "panic_hook",
         );
-        if let Ok(mut store) = magic_core::log::global_store().lock() {
+        if let Ok(mut store) = magic_log::global_store().lock() {
             store.push(entry);
         }
     }));

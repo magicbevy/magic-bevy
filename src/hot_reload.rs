@@ -200,7 +200,9 @@ pub fn init_file_watcher(
                         || pp.components().any(|c| c.as_os_str() == "packages")
                         || path_str.contains("magic_editor")
                         || path_str.contains("magic_runtime")
-                        || path_str.contains("magic_api")
+                        || path_str.contains("magic_api_editor")
+                        || path_str.contains("magic_api_runtime")
+                        || path_str.contains("magic_log")
                         || path_str.contains("magic_core");
 
                     if !is_valid {
@@ -218,7 +220,8 @@ pub fn init_file_watcher(
 
                     if path_str.contains("magic_editor")
                         || path_str.contains("magic_core")
-                        || path_str.contains("magic_api")
+                        || path_str.contains("magic_api_editor")
+                        || path_str.contains("magic_log")
                         || path_str.contains("/editor/")
                         || path_str.contains("\\editor\\")
                     {
@@ -226,7 +229,8 @@ pub fn init_file_watcher(
                     }
 
                     if path_str.contains("magic_runtime")
-                        || path_str.contains("magic_api")
+                        || path_str.contains("magic_api_runtime")
+                        || path_str.contains("magic_log")
                         || path_str.contains("/runtime/")
                         || path_str.contains("\\runtime\\")
                     {
@@ -261,7 +265,7 @@ pub fn init_file_watcher(
         }
     })
     .unwrap_or_else(|e| {
-        magic_core::oracle_error!("HotReload", "Failed to create file watcher: {}", e);
+        magic_log::oracle_error!("HotReload", "Failed to create file watcher: {}", e);
         panic!("file watcher creation failed: {}", e);
     });
 
@@ -272,7 +276,14 @@ pub fn init_file_watcher(
         }
     }
 
-    for watch_path in ["./magic_editor", "./magic_runtime", "./magic_api", "./magic_core"] {
+    for watch_path in [
+        "./magic_editor",
+        "./magic_runtime",
+        "./magic_api_editor",
+        "./magic_api_runtime",
+        "./magic_log",
+        "./magic_core",
+    ] {
         let pth = Path::new(watch_path);
         if pth.exists() {
             if let Ok(abs) = pth.canonicalize() {

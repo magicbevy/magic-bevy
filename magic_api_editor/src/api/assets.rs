@@ -29,10 +29,7 @@ impl AssetTypeDescriptor {
         display_name: impl Into<String>,
         icon: impl Into<String>,
     ) -> Self {
-        let ext = extension
-            .into()
-            .trim_start_matches('.')
-            .to_lowercase();
+        let ext = extension.into().trim_start_matches('.').to_lowercase();
         Self {
             extension: ext,
             display_name: display_name.into(),
@@ -41,7 +38,11 @@ impl AssetTypeDescriptor {
             icon: icon.into(),
             color: Color32::from_rgb(110, 86, 240),
             default_name: None,
-            folders: vec!["assets".to_string(), "editor".to_string(), "runtime".to_string()],
+            folders: vec![
+                "assets".to_string(),
+                "editor".to_string(),
+                "runtime".to_string(),
+            ],
             subfolders: Vec::new(),
             on_create: None,
             on_open: None,

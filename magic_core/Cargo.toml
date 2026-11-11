@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-magic_api = { path = "../magic_api" }
+magic_api_editor = { path = "../magic_api_editor" }
+magic_log = { path = "../magic_log" }
 eframe = { workspace = true }
 egui = { workspace = true }
 egui-phosphor = { workspace = true }
-colored = "3.1.1"
 serde = { workspace = true }
 toml = { workspace = true }
 resvg = "0.49.0"

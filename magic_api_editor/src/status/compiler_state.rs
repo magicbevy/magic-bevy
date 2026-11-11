@@ -1,7 +1,10 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum CompileStatus {
     Idle,
-    Compiling { current_file: String, progress: usize },
+    Compiling {
+        current_file: String,
+        progress: usize,
+    },
     Success,
     Error(String),
 }

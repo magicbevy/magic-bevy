@@ -127,9 +127,9 @@ impl EngineTheme {
     }
 }
 
-fn host_push_log(level: magic_core::log::LogLevel, source: &str, msg: &str) {
-    let entry = magic_core::log::LogEntry::new(level, msg, source);
-    if let Ok(mut store) = magic_core::log::global_store().lock() {
+fn host_push_log(level: magic_log::LogLevel, source: &str, msg: &str) {
+    let entry = magic_log::LogEntry::new(level, msg, source);
+    if let Ok(mut store) = magic_log::global_store().lock() {
         store.push(entry);
     }
 }
@@ -201,7 +201,7 @@ impl MagicBevyApp {
             }
             Err(err) => {
                 mgwarn!("PackageSync", "Sync failed: {}", err);
-                magic_core::oracle_error!("PackageSync", "Sync failed: {}", err);
+                magic_log::oracle_error!("PackageSync", "Sync failed: {}", err);
             }
         }
 
@@ -702,11 +702,11 @@ impl eframe::App for MagicBevyApp {
                 }
                 CompilerMessage::RuntimeBuildSuccess => {
                     self.compiler_manager.set_success();
-                    magic_core::mgprint!("HotReload", "Runtime build succeeded.");
+                    magic_log::mgprint!("HotReload", "Runtime build succeeded.");
                 }
                 CompilerMessage::CompileError(err) => {
                     self.compiler_manager.set_error(&err);
-                    magic_core::oracle_error!("HotReload", "Compile error: {}", err);
+                    magic_log::oracle_error!("HotReload", "Compile error: {}", err);
                 }
             }
         }

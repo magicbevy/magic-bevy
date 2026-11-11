@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use magic_api::log::{global_store, LogLevel};
+use magic_log::{global_store, LogLevel};
 use chrono::Timelike;
 use eframe::egui::{self, Color32, RichText, Sense, Stroke};
 
@@ -631,8 +631,8 @@ fn extract_file_line(msg: &str) -> Option<String> {
     None
 }
 
-impl magic_api::api::window::EditorWindow for OracleLogsWindow {
-    fn id(&self) -> magic_api::api::window::WindowId {
+impl magic_api_editor::api::window::EditorWindow for OracleLogsWindow {
+    fn id(&self) -> magic_api_editor::api::window::WindowId {
         "oracle_logs".to_string()
     }
 

@@ -55,7 +55,7 @@ impl LayoutManager {
         let path = magic.join("active_layout.json");
         let content = serde_json::to_string(&serde_json::json!({ "active_layout": name }))
             .unwrap_or_else(|e| {
-                magic_core::oracle_error!("Layout", "Failed to serialize active layout: {}", e);
+                magic_log::oracle_error!("Layout", "Failed to serialize active layout: {}", e);
                 String::new()
             });
         let _ = std::fs::write(&path, content);
@@ -81,7 +81,7 @@ impl LayoutManager {
         let layout_path = magic.join(".temp.layout");
         let json = serde_json::to_string_pretty(dock_state)
             .unwrap_or_else(|e| {
-                magic_core::oracle_error!("Layout", "Failed to serialize temp layout: {}", e);
+                magic_log::oracle_error!("Layout", "Failed to serialize temp layout: {}", e);
                 String::new()
             });
         let _ = std::fs::write(&layout_path, json);
@@ -124,7 +124,7 @@ impl LayoutManager {
 
         let json = serde_json::to_string_pretty(dock_state)
             .unwrap_or_else(|e| {
-                magic_core::oracle_error!("Layout", "Failed to serialize layout '{}': {}", name, e);
+                magic_log::oracle_error!("Layout", "Failed to serialize layout '{}': {}", name, e);
                 String::new()
             });
         let _ = std::fs::write(&layout_path, json);

@@ -2244,8 +2244,8 @@ dependencies = [
  "egui-phosphor",
  "egui_dock",
  "libloading",
- "magic_api",
  "magic_core",
+ "magic_log",
  "magic_pkg",
  "notify",
  "serde",
@@ -2254,14 +2254,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "magic_api"
+name = "magic_api_editor"
 version = "0.1.0"
 dependencies = [
- "chrono",
- "colored",
  "eframe",
  "egui",
+ "magic_log",
  "serde",
+]
+
+[[package]]
+name = "magic_api_runtime"
+version = "0.1.0"
+dependencies = [
+ "magic_log",
 ]
 
 [[package]]
@@ -2269,11 +2275,11 @@ name = "magic_core"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "colored",
  "eframe",
  "egui",
  "egui-phosphor",
- "magic_api",
+ "magic_api_editor",
+ "magic_log",
  "resvg",
  "serde",
  "tiny-skia 0.12.0",
@@ -2285,8 +2291,17 @@ dependencies = [
 name = "magic_editor"
 version = "0.1.0"
 dependencies = [
- "magic_api",
+ "magic_api_editor",
+ "magic_log",
  "magic_pkg_editor",
+]
+
+[[package]]
+name = "magic_log"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "colored",
 ]
 
 [[package]]
@@ -2294,7 +2309,7 @@ name = "magic_pkg"
 version = "0.1.0"
 dependencies = [
  "clap",
- "magic_api",
+ "magic_log",
  "serde",
  "toml",
  "ureq",
@@ -2305,21 +2320,22 @@ dependencies = [
 name = "magic_pkg_editor"
 version = "0.1.0"
 dependencies = [
- "magic_api",
+ "magic_api_editor",
 ]
 
 [[package]]
 name = "magic_pkg_runtime"
 version = "0.1.0"
 dependencies = [
- "magic_api",
+ "magic_api_runtime",
 ]
 
 [[package]]
 name = "magic_runtime"
 version = "0.1.0"
 dependencies = [
- "magic_api",
+ "magic_api_runtime",
+ "magic_log",
  "magic_pkg_runtime",
 ]
 

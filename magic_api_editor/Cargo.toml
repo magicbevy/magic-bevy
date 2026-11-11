@@ -1,5 +1,5 @@
 [package]
-name = "magic_api"
+name = "magic_api_editor"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,8 +8,7 @@ default = ["ui"]
 ui = ["dep:eframe", "dep:egui"]
 
 [dependencies]
-colored = "3.1.1"
+magic_log = { path = "../magic_log" }
 serde = { workspace = true }
-chrono = "0.4"
 eframe = { workspace = true, optional = true }
 egui = { workspace = true, optional = true }

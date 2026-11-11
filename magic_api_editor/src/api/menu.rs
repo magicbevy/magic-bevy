@@ -1,4 +1,4 @@
-use crate::*;
+use magic_log::mgprint;
 
 pub type CommandCallback = Box<dyn Fn() + Send + Sync + 'static>;
 
@@ -66,10 +66,14 @@ impl MenuRegistry {
             }
         };
 
-        add_item_to_menu_items(&mut self.menus[menu_idx].items, &path[1..], MenuItem::Action {
-            label: label.to_string(),
-            callback,
-        });
+        add_item_to_menu_items(
+            &mut self.menus[menu_idx].items,
+            &path[1..],
+            MenuItem::Action {
+                label: label.to_string(),
+                callback,
+            },
+        );
     }
 
     pub fn register_submenu(&mut self, path: &[&str], submenu_label: &str) {
@@ -95,13 +99,22 @@ impl MenuRegistry {
             }
         };
 
-        add_item_to_menu_items(&mut self.menus[menu_idx].items, &path[1..], MenuItem::Submenu {
-            label: submenu_label.to_string(),
-            items: Vec::new(),
-        });
+        add_item_to_menu_items(
+            &mut self.menus[menu_idx].items,
+            &path[1..],
+            MenuItem::Submenu {
+                label: submenu_label.to_string(),
+                items: Vec::new(),
+            },
+        );
     }
 
-    pub fn register_in_core(&mut self, core_menu_name: &str, label: &str, callback: CommandCallback) {
+    pub fn register_in_core(
+        &mut self,
+        core_menu_name: &str,
+        label: &str,
+        callback: CommandCallback,
+    ) {
         self.register_action(&[core_menu_name], label, callback);
     }
 
@@ -112,7 +125,10 @@ impl MenuRegistry {
             }
         }
         self.menus.retain(|m| m.reserved);
-        mgprint!("MenuRegistry", "All top editor menus have been successfully reset and cleared.");
+        mgprint!(
+            "MenuRegistry",
+            "All top editor menus have been successfully reset and cleared."
+        );
     }
 }
 
@@ -131,7 +147,10 @@ fn add_item_to_menu_items(items: &mut Vec<MenuItem>, remaining_path: &[&str], it
 
     match existing_idx {
         Some(idx) => {
-            if let MenuItem::Submenu { items: sub_items, .. } = &mut items[idx] {
+            if let MenuItem::Submenu {
+                items: sub_items, ..
+            } = &mut items[idx]
+            {
                 add_item_to_menu_items(sub_items, &remaining_path[1..], item);
             }
         }

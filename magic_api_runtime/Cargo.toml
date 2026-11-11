@@ -1,0 +1,7 @@
+[package]
+name = "magic_api_runtime"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+magic_log = { path = "../magic_log" }

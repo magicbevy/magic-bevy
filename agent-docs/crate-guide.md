@@ -4,7 +4,7 @@
 
 **Path:** `/src/main.rs` (entry point) + `/src/app.rs`, `/src/hot_reload.rs`, `/src/windows.rs`, `/src/layouts.rs`  
 **Type:** binary (eframe app)  
-**Dependencies:** `magic_core`, `magic_pkg`, `eframe`, `egui`, `notify`, `libloading`, `colored`
+**Dependencies:** `magic_core`, `magic_pkg`, `magic_log`, `eframe`, `egui`, `notify`, `libloading`
 
 ### Modules
 
@@ -19,53 +19,93 @@
 
 ---
 
-## `magic_core`
+## `magic_api_editor`
 
-**Path:** `magic_core/src/`  
-**Type:** library  
-**Dependencies:** `eframe`, `egui`, `colored`
+**Path:** `magic_api_editor/src/`
+**Type:** library
+**Dependencies:** `magic_log`, `eframe`, `egui`, `serde`
 
 ### Modules
 
 | Module | File | Purpose |
 |--------|------|---------|
-| `api` | `api/mod.rs` | Re-exports `EditorRegistry`, `EditorEventRegistry`, `MenuRegistry`, `RuntimeRegistry` |
-| `api/editor` | `api/editor.rs` | `EditorRegistry<'a>` — menu + events references passed to packages |
+| `api` | `api/mod.rs` | Re-exports editor registries and windows |
+| `api/editor` | `api/editor.rs` | `EditorRegistry<'a>` — menu, events, windows, assets, log callback |
 | `api/events` | `api/events.rs` | `EditorEventRegistry` — compile start/success callbacks |
 | `api/menu` | `api/menu.rs` | `MenuRegistry` — hierarchical menu structure (Action, Submenu, Separator) |
-| `api/window` | `api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstance`, `WindowInstances`, `WindowTab` |
-| `api/runtime` | `api/runtime.rs` | `RuntimeRegistry<'a>` — minimal, future use |
+| `api/window` | `api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstances`, `WindowTab` |
+| `api/assets` | `api/assets.rs` | `AssetTypeRegistry`, `AssetTypeDescriptor` |
 | `compiler` | `compiler.rs` | `EngineCompilerState` global singleton (lock mode, reload request) |
-| `logger` | `logger.rs` | Colored print macros (`mgprint!`, `mgwarn!`, `mgerror!`, `mgsuccess!`) |
-| `status` | `status/mod.rs` | `CompilerStateManager`, `CompileStatus` enum |
-| `status/compiler_state` | `status/compiler_state.rs` | `CompileStatus` variants + `CompilerStateManager` |
-| `ui` | `ui/mod.rs` | Re-exports `top_bar`, `indicator` |
-| `ui/top_bar` | `ui/top_bar.rs` | `draw_top_bar()` — egui top panel, returns `LayoutAction` for save/load |
-| `ui/indicator` | `ui/indicator.rs` | `draw_status_indicator()` — blinking LED + text for compile status |
-| `loader` | `loader/mod.rs` | `PackageManager` (editor lib loader), `PackageReloader` (legacy) |
-| `loader/editor_lib` | `loader/editor_lib.rs` | Loads `libmagic_editor.so`, extracts `create_system` symbol |
-| `loader/package_reloader` | `loader/package_reloader.rs` | Reads `package.toml` (legacy, not used in main flow) |
-| `package_manager` | `package_manager/mod.rs` | Empty module |
+| `status` | `status/mod.rs` | `CompilerStateManager`, `CompileStatus` |
 
-**Do not modify unless:** changing core APIs, adding new engine-wide systems, or modifying the compile state machine.
+**Do not modify unless:** changing editor package APIs or the compile state machine.
+
+---
+
+## `magic_api_runtime`
+
+**Path:** `magic_api_runtime/src/`
+**Type:** library
+**Dependencies:** `magic_log`
+
+### Modules
+
+| Module | File | Purpose |
+|--------|------|---------|
+| `api/runtime` | `api/runtime.rs` | `RenderDriver`, `RenderContext`, `UpdateRegistry`, `RuntimeRegistry` |
+
+**Do not modify unless:** changing runtime package APIs or the update loop.
+
+---
+
+## `magic_log`
+
+**Path:** `magic_log/src/`
+**Type:** library
+**Dependencies:** `colored`, `chrono`
+
+### Modules
+
+| Module | File | Purpose |
+|--------|------|---------|
+| `log` | `log/mod.rs` | Log callback singleton and `push_log` |
+| `log/store` | `log/store.rs` | `LogEntry`, `LogLevel`, `LogStore`, `global_store` |
+| `log/macros` | `log/macros.rs` | `oracle_*` macros |
+| `logger` | `logger.rs` | Colored `mg*` macros |
+| `oracle` | `oracle.rs` | Convenience re-exports for `oracle_*` macros |
+
+---
+
+## `magic_core`
+
+**Path:** `magic_core/src/`
+**Type:** library
+**Dependencies:** `magic_api_editor`, `magic_log`, `eframe`, `egui`
+
+### Modules
+
+| Module | File | Purpose |
+|--------|------|---------|
+| `lib` | `lib.rs` | Re-exports `magic_api_editor` and logging types/macros |
+| `ui` | `ui/mod.rs` | Editor windows: top bar, indicator, Oracle Logs, Grimoire, inspector |
+
+**Do not modify unless:** changing editor UI or the host-side integration.
 
 ---
 
 ## `magic_editor`
 
-**Path:** `magic_editor/src/`  
-**Type:** cdylib (dynamic library)  
-**Dependencies:** `magic_core`, `magic_pkg_editor`, `eframe`, `egui`, `serde`, `serde_json`, `colored`
+**Path:** `magic_editor/src/`
+**Type:** cdylib (dynamic library)
+**Dependencies:** `magic_api_editor`, `magic_log`, `magic_pkg_editor`
 
 ### Modules
 
 | Module | File | Purpose |
 |--------|------|---------|
-| `lib` | `lib.rs` | Exports `register_all_packages` (delegates to `magic_pkg_editor`) |
-| `systems` | `systems/mod.rs` | `EditorSystem` trait + `SystemManager` |
-| `systems/system` | `systems/system.rs` | `EditorSystem` trait (`on_enable`, `on_update`, `on_disable`) |
-| `systems/manager` | `systems/manager.rs` | `SystemManager` — owns `Vec<Box<dyn EditorSystem>>` |
-| `profile` | `profile/mod.rs` | Commented-out placeholder |
+| `lib` | `lib.rs` | Exports `register_all_packages` |
+| `systems` | `systems/` | `EditorSystem` trait + `SystemManager` |
+| `profile` | `profile/mod.rs` | Placeholder |
 
 **Do not modify unless:** adding editor systems, changing the `EditorSystem` trait, or modifying the cdylib export symbol.
 
@@ -75,7 +115,7 @@
 
 **Path:** `magic_pkg/src/`  
 **Type:** library + binary (CLI)  
-**Dependencies:** `clap`, `magic_core`, `serde`, `serde_json`, `toml`, `ureq`, `zip`
+**Dependencies:** `clap`, `magic_log`, `serde`, `serde_json`, `toml`, `ureq`, `zip`
 
 ### Modules
 
@@ -103,9 +143,9 @@
 
 **Path:** `magic_runtime/src/lib.rs`  
 **Type:** library  
-**Dependencies:** `magic_core`, `magic_pkg_runtime`
+**Dependencies:** `magic_api_runtime`, `magic_log`, `magic_pkg_runtime`
 
-Minimal crate with `add()` function and test. Reserved for future runtime engine code.
+Registers runtime packages and forwards the host log callback. Reserved for future runtime engine code.
 
 ### Sub-crate: `magic_pkg_runtime`
 
