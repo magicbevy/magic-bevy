@@ -12,7 +12,6 @@ This folder contains documentation for AI agents working on the MagicBevy projec
 | `workflows.md` | Step-by-step workflows: hot-reload, package init/sync/install/update/bump |
 | `key-files.md` | Quick reference to all important files and exported symbols |
 | `coding-conventions.md` | Naming, formatting, logging, error handling, concurrency, unsafe rules |
-| `dev-status/STATUS.md` | Current dev phase, completed/in-progress items, file changes, build status |
 
 ## How to Use
 
