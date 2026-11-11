@@ -1,5 +1,39 @@
 use std::any::Any;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
+
+pub trait RenderDriver {
+    fn init(&mut self, width: u32, height: u32, ctx: &mut RenderContext) -> Result<(), String>;
+    fn render(&mut self, ctx: &mut RenderContext) -> Result<(), String>;
+    fn present(&mut self) -> Result<(), String>;
+    fn resize(&mut self, width: u32, height: u32);
+    fn shutdown(&mut self);
+    fn raw_window_handle(&self) -> Option<*mut std::ffi::c_void>;
+}
+
+pub struct RenderContext {
+    pub width: u32,
+    pub height: u32,
+    pub instance: Option<Box<dyn Any + Send + Sync>>,
+    pub adapter: Option<Box<dyn Any + Send + Sync>>,
+    pub device: Option<Box<dyn Any + Send + Sync>>,
+    pub queue: Option<Box<dyn Any + Send + Sync>>,
+    pub swapchain: Option<Box<dyn Any + Send + Sync>>, // Holds the rendered wgpu::Texture from Bevy
+}
+
+impl Default for RenderContext {
+    fn default() -> Self {
+        Self {
+            width: 1280,
+            height: 720,
+            instance: None,
+            adapter: None,
+            device: None,
+            queue: None,
+            swapchain: None,
+        }
+    }
+}
 
 pub struct UpdateRegistry {
     callbacks: Vec<Box<dyn FnMut(f32)>>,
@@ -21,7 +55,9 @@ impl UpdateRegistry {
     }
 
     pub fn set_target_fps(&mut self, fps: f32) {
-        if fps > 0.0 { self.target_fps = fps; }
+        if fps > 0.0 {
+            self.target_fps = fps;
+        }
     }
 
     pub fn set_time_scale(&mut self, scale: f32) {
@@ -54,7 +90,7 @@ impl UpdateRegistry {
 }
 
 pub struct RuntimeRegistry<'a> {
-    pub render_context: Option<Box<dyn Any + Send>>,
+    pub render_context: Arc<Mutex<RenderContext>>,
     pub log_fn: Option<fn(crate::log::LogLevel, &str, &str)>,
     pub updates: &'a mut UpdateRegistry,
 }
