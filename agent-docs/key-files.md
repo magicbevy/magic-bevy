@@ -4,8 +4,9 @@
 
 | File | Purpose |
 |------|---------|
-| `Cargo.toml` | Workspace definition + root crate deps (libloading, eframe, egui, notify, colored) |
+| `Cargo.toml` | Workspace definition + root crate deps (magic_core, magic_pkg, magic_log, eframe, egui, notify) |
 | `Cargo.lock` | Locked dependency tree (auto-generated) |
+| `.github/workflows/release.yml` | GitHub release builds for Linux, Windows, and macOS |
 | `src/main.rs` | Application entry point (module declarations + `main()`) |
 | `src/app.rs` | `MagicBevyApp` struct, lifecycle, `eframe::App` impl |
 | `src/hot_reload.rs` | `CompilerMessage`, compile logic, file watcher |

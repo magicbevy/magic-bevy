@@ -146,3 +146,40 @@ magic_pkg bump
    - `timestamp` = current Unix epoch seconds
    - `channel` from `package.toml.channel` (default `"stable"`)
 3. Sorts releases by timestamp descending
+
+## 8. GitHub Release Workflow
+
+`.github/workflows/release.yml` builds the root `magic-bevy` binary on Linux, Windows, and macOS when a `v*` tag is pushed.
+
+Build command:
+
+```bash
+cargo build --release -p magic-bevy --bin magic-bevy
+```
+
+Release profile:
+
+- `lto = "thin"`
+- `codegen-units = 1`
+- `panic = "abort"`
+- `strip = "symbols"`
+
+Artifacts:
+
+```text
+magic-bevy-<version>-linux-x86_64.tar.gz
+magic-bevy-<version>-windows-x86_64.zip
+magic-bevy-<version>-macos-x86_64.tar.gz
+magic-bevy-<version>-macos-aarch64.tar.gz
+```
+
+Runner versions:
+
+- Linux: `ubuntu-22.04` (glibc 2.35)
+- Windows: `windows-2022`
+- macOS: `macos-13` (x86_64) and `macos-14` (aarch64)
+- `MACOSX_DEPLOYMENT_TARGET=11.0`
+
+The release job downloads the build artifacts and attaches them to the GitHub release.
+
+Note: this workflow builds only the root `magic-bevy` binary. It does not build `magic_editor` or `magic_runtime` cdylibs.
