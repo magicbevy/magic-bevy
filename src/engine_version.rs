@@ -10,6 +10,9 @@ const VERSIONS_TOML: &str = "versions.toml";
 #[derive(Debug, Deserialize)]
 struct MagicToml {
     version: String,
+    name: String,
+    #[serde(default)]
+    description: Option<String>,
     channel: String,
     portal: String,
 }
@@ -23,6 +26,10 @@ pub struct EngineReleasesFile {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EngineReleaseEntry {
     pub version: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     pub channel: String,
     pub portal: String,
 }
@@ -54,6 +61,8 @@ pub fn bump() -> Result<(), String> {
 
     releases_file.releases.push(EngineReleaseEntry {
         version: magic.version.clone(),
+        name: Some(magic.name.clone()),
+        description: magic.description.clone(),
         channel: magic.channel.clone(),
         portal: magic.portal.clone(),
     });
@@ -68,8 +77,8 @@ pub fn bump() -> Result<(), String> {
     mgsuccess!(
         TAG,
         format!(
-            "engine bumped to v{} (channel={}, portal={}) recorded in {VERSIONS_TOML}",
-            magic.version, magic.channel, magic.portal
+            "engine bumped to v{} \"{}\" (channel={}, portal={}) recorded in {VERSIONS_TOML}",
+            magic.version, magic.name, magic.channel, magic.portal
         )
     );
 
