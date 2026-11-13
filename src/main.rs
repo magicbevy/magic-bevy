@@ -1,6 +1,7 @@
 mod app;
 mod engine_version;
 mod hot_reload;
+mod magic_paths;
 mod windows;
 mod layouts;
 
@@ -46,7 +47,7 @@ fn main() -> Result<(), eframe::Error> {
 
     std::fs::create_dir_all("./packages").unwrap();
     std::fs::create_dir_all("./layouts").unwrap();
-    std::fs::create_dir_all("./.magic").unwrap();
+    magic_paths::ensure_layout().unwrap();
 
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()

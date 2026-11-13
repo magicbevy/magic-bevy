@@ -8,12 +8,38 @@ use std::time::{Duration, Instant};
 use magic_core::*;
 
 use crate::app::MagicBevyApp;
+use crate::magic_paths::{BuildProfile, BuildTarget};
 
 pub enum CompilerMessage {
     Indexing(String, usize),
     CompileSuccess,
     RuntimeBuildSuccess,
     CompileError(String),
+}
+
+fn build_target(target: BuildTarget) -> Result<(), String> {
+    let profile = BuildProfile::hot_reload();
+    let mut command = std::process::Command::new("cargo");
+    command.args(["build", "-p", target.package(), "--lib"]);
+    command.args(profile.cargo_args());
+    command.env("CARGO_TARGET_DIR", target.cache_dir());
+
+    let output = command.output().map_err(|error| {
+        format!(
+            "failed to run cargo for {}: {error}",
+            target.name()
+        )
+    })?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "{} build failed:\n{}",
+            target.name(),
+            String::from_utf8_lossy(&output.stderr)
+        ));
+    }
+
+    target.install_library().map(|_| ())
 }
 
 pub fn execute_compile(
@@ -40,6 +66,8 @@ pub fn execute_compile(
 
     let ctx_clone = ctx.clone();
     thread::spawn(move || {
+        let _ = crate::magic_paths::ensure_layout();
+
         // Optional package sync
         if run_sync {
             let _ = std::process::Command::new("cargo")
@@ -47,19 +75,6 @@ pub fn execute_compile(
                 .output();
         }
 
-        // Build targets
-        let mut args = vec!["build".to_string()];
-        if build_editor {
-            args.push("-p".to_string());
-            args.push("magic_editor".to_string());
-            args.push("--lib".to_string());
-        }
-        if build_runtime {
-            args.push("-p".to_string());
-            args.push("magic_runtime".to_string());
-        }
-
-        // If nothing to build, just finish
         if !build_editor && !build_runtime {
             let _ = tx.send(CompilerMessage::CompileSuccess);
             *is_compiling.lock().unwrap() = false;
@@ -67,36 +82,17 @@ pub fn execute_compile(
             return;
         }
 
-        // cargo build doesn't accept multiple -p with mixed --lib well; run per target instead
         let mut err_msg = String::new();
 
         if build_editor {
-            let out = std::process::Command::new("cargo")
-                .args(["build", "-p", "magic_editor", "--lib"])
-                .output();
-            match out {
-                Ok(o) if o.status.success() => {}
-                Ok(o) => {
-                    err_msg.push_str(&String::from_utf8_lossy(&o.stderr));
-                }
-                Err(e) => {
-                    err_msg.push_str(&e.to_string());
-                }
+            if let Err(error) = build_target(BuildTarget::Editor) {
+                err_msg.push_str(&error);
             }
         }
 
         if build_runtime && err_msg.is_empty() {
-            let out = std::process::Command::new("cargo")
-                .args(["build", "-p", "magic_runtime", "--lib"])
-                .output();
-            match out {
-                Ok(o) if o.status.success() => {}
-                Ok(o) => {
-                    err_msg.push_str(&String::from_utf8_lossy(&o.stderr));
-                }
-                Err(e) => {
-                    err_msg.push_str(&e.to_string());
-                }
+            if let Err(error) = build_target(BuildTarget::Runtime) {
+                err_msg.push_str(&error);
             }
         }
 

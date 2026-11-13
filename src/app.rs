@@ -1,5 +1,4 @@
 use eframe::egui::{self, Color32, CornerRadius, Margin, Stroke, Vec2};
-use std::path::Path;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 
@@ -275,16 +274,11 @@ impl MagicBevyApp {
         self.windows.factories.clear();
         self.current_lib = None;
 
-        #[cfg(target_os = "linux")]
-        let lib_path = "./target/debug/libmagic_editor.so";
-        #[cfg(target_os = "windows")]
-        let lib_path = "./target/debug/magic_editor.dll";
-        #[cfg(target_os = "macos")]
-        let lib_path = "./target/debug/libmagic_editor.dylib";
+        let lib_path = crate::magic_paths::editor_library_path();
 
-        if Path::new(lib_path).exists() {
+        if lib_path.exists() {
             unsafe {
-                if let Ok(lib) = libloading::Library::new(lib_path) {
+                if let Ok(lib) = libloading::Library::new(&lib_path) {
                     type RegisterFn = unsafe extern "Rust" fn(&mut EditorRegistry);
 
                     if let Ok(register_all_packages) =
@@ -346,7 +340,7 @@ impl MagicBevyApp {
                 }
             }
         } else {
-            mgwarn!("HotReload", "Library file not found at: {}", lib_path);
+            mgwarn!("HotReload", "Library file not found at: {}", lib_path.display());
         }
 
         self.mock_packages();

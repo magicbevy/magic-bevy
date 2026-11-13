@@ -51,3 +51,12 @@ opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
+
+[profile.magic_fast]
+inherits = "dev"
+opt-level = 0
+debug = 0
+incremental = true
+
+[profile.magic_fast.package."*"]
+opt-level = 0
