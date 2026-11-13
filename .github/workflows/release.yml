@@ -57,8 +57,6 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p dist
           cp "target/release/magic-bevy${{ matrix.ext }}" dist/
-          cp magic.toml versions.toml README.md LICENSE dist/
-          cp -r portal dist/portal
 
           if [ "${{ matrix.archive }}" = "zip" ]; then
             powershell -NoProfile -Command "Compress-Archive -Path 'dist/*' -DestinationPath 'magic-bevy-${VERSION}-${{ matrix.name }}.zip' -Force"

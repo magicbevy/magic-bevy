@@ -180,6 +180,6 @@ Runner versions:
 - macOS: `macos-13` (x86_64) and `macos-14` (aarch64)
 - `MACOSX_DEPLOYMENT_TARGET=11.0`
 
-The release job downloads the build artifacts and attaches them to the GitHub release.
+The archive contains only the `magic-bevy` binary for that platform. The release job downloads the build artifacts and attaches them to the GitHub release.
 
 Note: this workflow builds only the root `magic-bevy` binary. It does not build `magic_editor` or `magic_runtime` cdylibs.
