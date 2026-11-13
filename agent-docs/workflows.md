@@ -177,7 +177,7 @@ Runner versions:
 
 - Linux: `ubuntu-22.04` (glibc 2.35)
 - Windows: `windows-2022`
-- macOS: `macos-13` (x86_64) and `macos-14` (aarch64)
+- macOS: `macos-15-intel` (x86_64) and `macos-15` (aarch64)
 - `MACOSX_DEPLOYMENT_TARGET=11.0`
 
 The archive contains only the `magic-bevy` binary for that platform. The release job downloads the build artifacts and attaches them to the GitHub release.
