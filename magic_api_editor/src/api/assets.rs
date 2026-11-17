@@ -1,4 +1,4 @@
-use eframe::egui::{self, Color32};
+use crate::ui::{Color, Ui};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 pub type CreateAssetFn =
     Box<dyn Fn(&Path, &str) -> Result<PathBuf, String> + Send + Sync + 'static>;
 pub type OpenAssetFn = Box<dyn Fn(&Path) + Send + Sync + 'static>;
-pub type InspectAssetFn = Box<dyn FnMut(&mut egui::Ui, &[PathBuf]) + Send + 'static>;
+pub type InspectAssetFn = Box<dyn FnMut(&mut dyn Ui, &[PathBuf]) + Send + 'static>;
 
 pub struct AssetTypeDescriptor {
     pub extension: String,
@@ -14,7 +14,7 @@ pub struct AssetTypeDescriptor {
     pub category: Option<String>,
     pub package_name: Option<String>,
     pub icon: String,
-    pub color: Color32,
+    pub color: Color,
     pub default_name: Option<String>,
     pub folders: Vec<String>,
     pub subfolders: Vec<String>,
@@ -36,7 +36,7 @@ impl AssetTypeDescriptor {
             category: None,
             package_name: None,
             icon: icon.into(),
-            color: Color32::from_rgb(110, 86, 240),
+            color: Color::from_rgb(110, 86, 240),
             default_name: None,
             folders: vec![
                 "assets".to_string(),
@@ -60,7 +60,7 @@ impl AssetTypeDescriptor {
         self
     }
 
-    pub fn color(mut self, color: Color32) -> Self {
+    pub fn color(mut self, color: Color) -> Self {
         self.color = color;
         self
     }
@@ -120,7 +120,7 @@ impl AssetTypeDescriptor {
 
     pub fn on_inspect<F>(mut self, callback: F) -> Self
     where
-        F: FnMut(&mut egui::Ui, &Path) + Send + 'static,
+        F: FnMut(&mut dyn Ui, &Path) + Send + 'static,
     {
         // adapt single-path callback to slice API
         let mut cb = callback;
@@ -134,7 +134,7 @@ impl AssetTypeDescriptor {
 
     pub fn on_inspect_many<F>(mut self, callback: F) -> Self
     where
-        F: FnMut(&mut egui::Ui, &[PathBuf]) + Send + 'static,
+        F: FnMut(&mut dyn Ui, &[PathBuf]) + Send + 'static,
     {
         self.on_inspect = Some(Box::new(callback));
         self

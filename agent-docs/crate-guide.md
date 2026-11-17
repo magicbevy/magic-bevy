@@ -23,7 +23,7 @@
 
 **Path:** `magic_api_editor/src/`
 **Type:** library
-**Dependencies:** `magic_log`, `eframe`, `egui`, `serde`
+**Dependencies:** `magic_log`, `serde` (egui-free — no `egui`/`eframe`)
 
 ### Modules
 
@@ -33,8 +33,9 @@
 | `api/editor` | `api/editor.rs` | `EditorRegistry<'a>` — menu, events, windows, assets, log callback |
 | `api/events` | `api/events.rs` | `EditorEventRegistry` — compile start/success callbacks |
 | `api/menu` | `api/menu.rs` | `MenuRegistry` — hierarchical menu structure (Action, Submenu, Separator) |
-| `api/window` | `api/window.rs` | `WindowId`, `EditorWindow` trait, `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstances`, `WindowTab` |
-| `api/assets` | `api/assets.rs` | `AssetTypeRegistry`, `AssetTypeDescriptor` |
+| `api/window` | `api/window.rs` | `WindowId`, `EditorWindow` trait (`draw(&mut dyn Ui)`), `WindowDescriptor`, `WindowFactory`, `WindowRegistry`, `WindowInstances`, `WindowTab` |
+| `api/assets` | `api/assets.rs` | `AssetTypeRegistry`, `AssetTypeDescriptor` (uses `Color`, `InspectAssetFn(&mut dyn Ui, ...)`) |
+| `ui` | `ui.rs` | `Ui` trait (egui-free draw contract) + `Color` / `Rect` value types |
 | `compiler` | `compiler.rs` | `EngineCompilerState` global singleton (lock mode, reload request) |
 | `status` | `status/mod.rs` | `CompilerStateManager`, `CompileStatus` |
 
@@ -87,6 +88,7 @@
 | Module | File | Purpose |
 |--------|------|---------|
 | `lib` | `lib.rs` | Re-exports `magic_api_editor` and logging types/macros |
+| `bridge` | `bridge.rs` | `EguiBridge` (impl `Ui` for `egui::Ui`), `downcast_egui`, `ColorExt`/`RectExt` conversions — the only place egui meets the abstract `Ui` |
 | `ui` | `ui/mod.rs` | Editor windows: top bar, indicator, Oracle Logs, Grimoire, inspector |
 
 **Do not modify unless:** changing editor UI or the host-side integration.

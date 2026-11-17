@@ -1,6 +1,7 @@
 use magic_api_editor::api::assets::global_asset_registry;
 use magic_api_editor::api::window::{EditorWindow, WindowId};
-use eframe::egui::{self, Color32, RichText, Stroke};
+use crate::ColorExt;
+use egui::{self, Color32, RichText, Stroke};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
@@ -443,7 +444,13 @@ impl EditorWindow for InspectorWindow {
         "Inspector"
     }
 
-    fn draw(&mut self, ui: &mut egui::Ui) {
+    fn draw(&mut self, ui: &mut dyn magic_api_editor::Ui) {
+        self.draw_egui(crate::downcast_egui(ui));
+    }
+}
+
+impl InspectorWindow {
+    fn draw_egui(&mut self, ui: &mut egui::Ui) {
         self.draw_top_bar(ui);
         ui.add_space(6.0);
 
@@ -547,7 +554,8 @@ impl EditorWindow for InspectorWindow {
                                             .stroke(Stroke::new(1.0, BORDER_COLOR))
                                             .inner_margin(10.0)
                                             .show(ui, |ui| {
-                                                (inspect_fn)(ui, &paths);
+                                                let mut bridge = crate::EguiBridge::new(ui);
+                                                (inspect_fn)(&mut bridge, &paths);
                                             });
                                     }
                                 }
@@ -598,7 +606,7 @@ impl EditorWindow for InspectorWindow {
                                 desc.icon.clone(),
                                 desc.display_name.clone(),
                                 desc.package_name.clone(),
-                                desc.color,
+                                desc.color.to_egui(),
                             ));
                         }
                     }
@@ -673,7 +681,8 @@ impl EditorWindow for InspectorWindow {
                                     .stroke(Stroke::new(1.0, BORDER_COLOR))
                                     .inner_margin(10.0)
                                     .show(ui, |ui| {
-                                        (inspect_fn)(ui, std::slice::from_ref(&path));
+                                        let mut bridge = crate::EguiBridge::new(ui);
+                                        (inspect_fn)(&mut bridge, std::slice::from_ref(&path));
                                     });
                             }
                         }

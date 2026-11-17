@@ -44,15 +44,24 @@ The former `magic_api` crate is split into three crates:
 
 ### `magic_api_editor`
 
-Editor-facing package API.
+Editor-facing package API. **Egui-free** — the draw contract is abstracted so packages/cdylib never link egui.
 
 - `api/editor.rs` — `EditorRegistry` with menu, events, windows, assets, `open_window_tx`, and `log_fn`
 - `api/menu.rs` — `MenuRegistry`, `MenuItem`, `MenuEntry`
 - `api/events.rs` — `EditorEventRegistry` (compile start/success callbacks)
-- `api/window.rs` — `WindowId`, `EditorWindow`, `WindowRegistry`, `WindowInstances`, `WindowTab`
-- `api/assets.rs` — `AssetTypeRegistry` and asset descriptors
+- `api/window.rs` — `WindowId`, `EditorWindow` (with `draw(&mut dyn Ui)`), `WindowRegistry`, `WindowInstances`, `WindowTab`
+- `api/assets.rs` — `AssetTypeRegistry` and asset descriptors (`Color`, `InspectAssetFn(&mut dyn Ui, ...)`)
+- `ui.rs` — `Ui` trait + `Color` / `Rect` value types (the egui-free draw contract)
 - `compiler.rs` — `EngineCompilerState` global singleton
 - `status/compiler_state.rs` — `CompileStatus` and `CompilerStateManager`
+
+### `magic_core` bridge (egui host side)
+
+`magic_core` is the only place egui is bound to the abstract `Ui`:
+
+- `bridge.rs` — `EguiBridge` implements `Ui` over `&mut egui::Ui`; `downcast_egui()` recovers the egui handle for host windows; `ColorExt`/`RectExt` convert `Color`/`Rect` ↔ `egui::Color32`/`egui::Rect`.
+- Built-in windows keep full egui by implementing an inherent `draw_egui(&mut egui::Ui)`; their `EditorWindow::draw(&mut dyn Ui)` downcasts and delegates.
+- Host draw loop (`src/windows.rs`) wraps the egui `Ui` in an `EguiBridge` and passes `&mut dyn Ui` to each window.
 
 ### `magic_api_runtime`
 

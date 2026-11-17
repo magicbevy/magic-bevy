@@ -215,7 +215,8 @@ impl<'a> TabViewer for WindowTabViewer<'a> {
         ui.set_min_width(200.0);
 
         if let Some(instance) = self.instances.get_mut(tab.instance_id) {
-            instance.window.draw(ui);
+            let mut bridge = EguiBridge::new(ui);
+            instance.window.draw(&mut bridge);
         }
     }
 

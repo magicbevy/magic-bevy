@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use eframe::egui;
+use egui;
 
 pub struct ContextMenuItem {
     pub label: String,

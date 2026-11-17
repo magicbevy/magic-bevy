@@ -1,7 +1,7 @@
 use magic_api_editor::api::{MenuItem, MenuRegistry};
 use magic_api_editor::status::CompileStatus;
 use crate::ui::indicator::draw_status_indicator;
-use eframe::egui::{self, RichText};
+use egui::{self, RichText};
 
 #[derive(Debug, Clone)]
 pub enum LayoutAction {

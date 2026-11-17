@@ -52,7 +52,7 @@ magic_pkg init --category editor --package vendor/name --editor --runtime
 3. Creates `assets/previews_pkg/.gitkeep`
 4. Writes `package.toml` with name, vendor, version, category, magic version, channel, status, targets
 5. For each target, writes target crate:
-   - `<name>/<target>/Cargo.toml` — depends on `magic_core`
+   - `<name>/<target>/Cargo.toml` — depends on `magic_api_editor` (editor target) or `magic_api_runtime` (runtime target)
    - `<name>/<target>/src/lib.rs` — empty `register()` function
 6. Calls `update_versions_file()` → creates/updates `versions.toml`
 7. Adds `vendor/name = "0.1.0"` to `packages.toml`

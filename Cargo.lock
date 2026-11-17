@@ -2257,8 +2257,6 @@ dependencies = [
 name = "magic_api_editor"
 version = "0.1.0"
 dependencies = [
- "eframe",
- "egui",
  "magic_log",
  "serde",
 ]
@@ -2275,7 +2273,6 @@ name = "magic_core"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "eframe",
  "egui",
  "egui-phosphor",
  "magic_api_editor",

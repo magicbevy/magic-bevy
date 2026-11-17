@@ -3,12 +3,6 @@ name = "magic_api_editor"
 version = "0.1.0"
 edition = "2024"
 
-[features]
-default = ["ui"]
-ui = ["dep:eframe", "dep:egui"]
-
 [dependencies]
 magic_log = { path = "../magic_log" }
 serde = { workspace = true }
-eframe = { workspace = true, optional = true }
-egui = { workspace = true, optional = true }

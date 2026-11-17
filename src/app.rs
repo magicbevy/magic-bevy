@@ -587,7 +587,7 @@ impl MagicBevyApp {
             reg.register(
                 magic_core::AssetTypeDescriptor::new("rs", "Rust Script", egui_phosphor::regular::FILE_RS)
                     .category("Script")
-                    .color(eframe::egui::Color32::from_rgb(249, 115, 22))
+                    .color(magic_core::Color::from_rgb(249, 115, 22))
                     .folders(["editor", "runtime"])
                     .subfolders(["src"])
                     .default_name("new_script")
@@ -603,7 +603,7 @@ impl MagicBevyApp {
             reg.register(
                 magic_core::AssetTypeDescriptor::new("toml", "TOML Data", egui_phosphor::regular::FILE_TEXT)
                     .category("Data")
-                    .color(eframe::egui::Color32::from_rgb(56, 189, 248))
+                    .color(magic_core::Color::from_rgb(56, 189, 248))
                     .folders(["assets", "editor", "runtime"])
                     .default_name("new_data")
                     .on_create(|dir, stem| {
@@ -618,7 +618,7 @@ impl MagicBevyApp {
             reg.register(
                 magic_core::AssetTypeDescriptor::new("json", "JSON Data", egui_phosphor::regular::FILE_TEXT)
                     .category("Data")
-                    .color(eframe::egui::Color32::from_rgb(56, 189, 248))
+                    .color(magic_core::Color::from_rgb(56, 189, 248))
                     .folders(["assets", "editor", "runtime"])
                     .default_name("new_data")
                     .on_create(|dir, stem| {

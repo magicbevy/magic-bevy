@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 
 use magic_log::{global_store, LogLevel};
 use chrono::Timelike;
-use eframe::egui::{self, Color32, RichText, Sense, Stroke};
+use egui::{self, Color32, RichText, Sense, Stroke};
 
 fn copy_to_clipboard(ctx: &egui::Context, text: &str) {
     ctx.copy_text(text.to_string());
@@ -640,7 +640,13 @@ impl magic_api_editor::api::window::EditorWindow for OracleLogsWindow {
         "Oracle Logs"
     }
 
-    fn draw(&mut self, ui: &mut egui::Ui) {
+    fn draw(&mut self, ui: &mut dyn magic_api_editor::Ui) {
+        self.draw_egui(crate::downcast_egui(ui));
+    }
+}
+
+impl OracleLogsWindow {
+    fn draw_egui(&mut self, ui: &mut egui::Ui) {
         self.draw_toolbar(ui);
         ui.add_space(4.0);
         self.draw_logs(ui);

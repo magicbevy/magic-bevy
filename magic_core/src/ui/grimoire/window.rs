@@ -18,7 +18,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use eframe::egui::{self, Color32, Key, RichText, Sense, Stroke, Vec2};
+use egui::{self, Color32, Key, RichText, Sense, Stroke, Vec2};
+use crate::ColorExt;
 
 use super::types::{PackageInfo, ViewMode};
 use magic_api_editor::api::assets::global_asset_registry;
@@ -926,7 +927,7 @@ impl GrimoireWindow {
                 return (
                     desc.icon.clone(),
                     Some(desc.display_name.clone()),
-                    desc.color,
+                    desc.color.to_egui(),
                 );
             }
         }
@@ -2290,7 +2291,13 @@ impl EditorWindow for GrimoireWindow {
         }
     }
 
-    fn draw(&mut self, ui: &mut egui::Ui) {
+    fn draw(&mut self, ui: &mut dyn magic_api_editor::Ui) {
+        self.draw_egui(crate::downcast_egui(ui));
+    }
+}
+
+impl GrimoireWindow {
+    fn draw_egui(&mut self, ui: &mut egui::Ui) {
         self.refresh_if_requested();
         self.rename_edit_clicked = false;
         self.rename_edit_rect = None;

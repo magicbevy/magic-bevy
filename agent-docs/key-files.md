@@ -28,8 +28,9 @@
 | `src/api/editor.rs` | `EditorRegistry` struct |
 | `src/api/events.rs` | `EditorEventRegistry` (compile callbacks) |
 | `src/api/menu.rs` | `MenuRegistry` + `MenuItem` + `MenuEntry` |
-| `src/api/window.rs` | `WindowId`, `EditorWindow`, `WindowRegistry`, `WindowInstances`, `WindowTab` |
+| `src/api/window.rs` | `WindowId`, `EditorWindow` (`draw(&mut dyn Ui)`), `WindowRegistry`, `WindowInstances`, `WindowTab` |
 | `src/api/assets.rs` | `AssetTypeRegistry`, `AssetTypeDescriptor` |
+| `src/ui.rs` | `Ui` trait + `Color`/`Rect` value types (egui-free) |
 | `src/status/compiler_state.rs` | `CompileStatus` enum + `CompilerStateManager` |
 
 ## `magic_api_runtime/`
@@ -56,6 +57,7 @@
 |------|---------|
 | `Cargo.toml` | Editor UI crate, deps on magic_api_editor, magic_log, eframe, egui |
 | `src/lib.rs` | Re-exports editor API + logging |
+| `src/bridge.rs` | `EguiBridge` (impl `Ui` for `egui::Ui`), `downcast_egui`, `ColorExt`/`RectExt` conversions |
 | `src/ui/top_bar.rs` | `draw_top_bar()` — egui top panel with dock controls |
 | `src/ui/indicator.rs` | `draw_status_indicator()` — LED + text |
 | `src/ui/oracle_logs.rs` | Oracle Logs window |

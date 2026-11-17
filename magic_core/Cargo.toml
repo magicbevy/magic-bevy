@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 magic_api_editor = { path = "../magic_api_editor" }
 magic_log = { path = "../magic_log" }
-eframe = { workspace = true }
 egui = { workspace = true }
 egui-phosphor = { workspace = true }
 serde = { workspace = true }

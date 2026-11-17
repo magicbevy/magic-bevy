@@ -1,3 +1,4 @@
+use crate::ui::{Rect, Ui};
 use std::hash::Hash;
 
 pub type WindowId = String;
@@ -5,7 +6,7 @@ pub type WindowId = String;
 pub trait EditorWindow: Send + Sync {
     fn id(&self) -> WindowId;
     fn title(&self) -> &str;
-    fn draw(&mut self, ui: &mut egui::Ui);
+    fn draw(&mut self, ui: &mut dyn Ui);
     fn save_state(&self) -> Option<String> {
         None
     }
@@ -59,7 +60,7 @@ pub struct WindowInstance {
     pub title: String,
     pub window: Box<dyn EditorWindow>,
     pub open: bool,
-    pub rect: Option<egui::Rect>,
+    pub rect: Option<Rect>,
 }
 
 pub struct WindowInstances {

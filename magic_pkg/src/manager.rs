@@ -890,12 +890,9 @@ impl PackageManager {
         let api_path = workspace_root.join(api_dir);
         let rel_api_path = crate::utils::relative_path(&target_root, &api_path);
         let api_path_str = crate::utils::toml_path(&rel_api_path);
-        let log_path = workspace_root.join("magic_log");
-        let rel_log_path = crate::utils::relative_path(&target_root, &log_path);
-        let log_path_str = crate::utils::toml_path(&rel_log_path);
 
         let cargo_toml = format!(
-            "[package]\nname = \"{crate_name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\n\n[dependencies]\n{api_dir} = {{ path = \"{api_path_str}\" }}\nmagic_log = {{ path = \"{log_path_str}\" }}\n",
+            "[package]\nname = \"{crate_name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\n\n[dependencies]\n{api_dir} = {{ path = \"{api_path_str}\" }}\n",
         );
         fs::write(target_root.join("Cargo.toml"), cargo_toml).map_err(|source| {
             PackageError::Io {

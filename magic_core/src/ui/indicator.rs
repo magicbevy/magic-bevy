@@ -1,5 +1,5 @@
 
-use eframe::egui;
+use egui;
 use magic_api_editor::status::CompileStatus;
 
 pub fn draw_status_indicator(ctx: &egui::Context, ui: &mut egui::Ui, status: &CompileStatus) {
